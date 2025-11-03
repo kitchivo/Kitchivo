@@ -31,7 +31,7 @@ const HeroSection = () => {
   };
 
   return (
-    <section id="home" className="relative min-h-[600px] md:min-h-[700px] overflow-hidden">
+    <section id="home" className="relative min-h-[600px] md:min-h-[800px] overflow-hidden mt-0">
       <div className="absolute inset-0 w-full h-full">
         {heroImages.map((image, index) => (
           <div
