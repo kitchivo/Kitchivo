@@ -35,31 +35,31 @@ const FAQsSection = () => {
   };
 
   return (
-    <section className="py-16 md:py-24 bg-white">
-      <div className="max-w-[1400px] mx-auto px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <span className="inline-block px-4 py-2 bg-lima-100 text-lima-700 rounded-full text-sm font-semibold mb-4">
+    <section className="py-8 sm:py-12 md:py-16 bg-white">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-8 sm:mb-12">
+          <span className="inline-block px-3 sm:px-4 py-1.5 sm:py-2 bg-lima-100 text-lima-700 rounded-full text-xs sm:text-sm font-semibold mb-3 sm:mb-4">
             HELP CENTER
           </span>
-          <h2 className="text-3xl md:text-4xl font-bold text-[#1E1E1E] mb-4">Frequently Asked Questions</h2>
-          <p className="text-gray-600 text-lg">Find answers to common questions about our products and services</p>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#1E1E1E] mb-2 sm:mb-4">Frequently Asked Questions</h2>
+          <p className="text-gray-600 text-sm sm:text-base md:text-lg">Find answers to common questions about our products and services</p>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           {faqs.map((faq, index) => (
             <div 
               key={index} 
-              className="border-2 border-gray-200 rounded-xl overflow-hidden hover:border-lima-500 transition-all duration-300"
+              className="border-2 border-gray-200 rounded-lg sm:rounded-xl overflow-hidden hover:border-lima-500 transition-all duration-300"
             >
               <button
                 onClick={() => toggleFAQ(index)}
-                className="w-full px-6 py-5 flex items-center justify-between bg-white hover:bg-gray-50 transition-colors"
+                className="w-full px-4 sm:px-6 py-4 sm:py-5 flex items-center justify-between bg-white hover:bg-gray-50 active:bg-gray-100 transition-colors"
               >
-                <span className="text-left font-semibold text-gray-800 text-lg pr-4">
+                <span className="text-left font-semibold text-gray-800 text-sm sm:text-base md:text-lg pr-3 sm:pr-4">
                   {faq.question}
                 </span>
                 <svg 
-                  className={`w-6 h-6 text-lima-600 transform transition-transform duration-300 flex-shrink-0 ${openIndex === index ? 'rotate-180' : ''}`}
+                  className={`w-5 h-5 sm:w-6 sm:h-6 text-lima-600 transform transition-transform duration-300 flex-shrink-0 ${openIndex === index ? 'rotate-180' : ''}`}
                   fill="none" 
                   stroke="currentColor" 
                   viewBox="0 0 24 24"
@@ -71,8 +71,8 @@ const FAQsSection = () => {
               <div 
                 className={`overflow-hidden transition-all duration-300 ${openIndex === index ? 'max-h-96' : 'max-h-0'}`}
               >
-                <div className="px-6 py-5 bg-gray-50 border-t-2 border-gray-200">
-                  <p className="text-gray-600 leading-relaxed">
+                <div className="px-4 sm:px-6 py-4 sm:py-5 bg-gray-50 border-t-2 border-gray-200">
+                  <p className="text-gray-600 text-sm sm:text-base leading-relaxed">
                     {faq.answer}
                   </p>
                 </div>
@@ -81,11 +81,11 @@ const FAQsSection = () => {
           ))}
         </div>
 
-        <div className="text-center mt-12">
-          <p className="text-gray-600 mb-4">Still have questions?</p>
+        <div className="text-center mt-8 sm:mt-12">
+          <p className="text-gray-600 text-sm sm:text-base mb-3 sm:mb-4">Still have questions?</p>
           <a 
             href="#contact" 
-            className="inline-block px-8 py-3 bg-lima-600 text-white font-semibold rounded-lg hover:bg-lima-700 transition-all duration-300 transform hover:scale-105"
+            className="inline-block px-6 sm:px-8 py-2.5 sm:py-3 bg-lima-600 text-white font-semibold text-sm sm:text-base rounded-lg hover:bg-lima-700 active:bg-lima-800 transition-all duration-300 transform hover:scale-105 active:scale-95"
           >
             Contact Support
           </a>
