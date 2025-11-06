@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import Logo from '../assets/Logo_Full.png';
 
 const Navbar = () => {
@@ -6,6 +7,7 @@ const Navbar = () => {
   const [shopDropdown, setShopDropdown] = useState(false);
   const [pagesDropdown, setPagesDropdown] = useState(false);
   const [collectionsDropdown, setCollectionsDropdown] = useState(false);
+  const [collectionsDropdownOpen, setCollectionsDropdownOpen] = useState(false);
   const [blogDropdown, setBlogDropdown] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
 
@@ -60,15 +62,17 @@ const Navbar = () => {
           <div className="flex justify-between items-center h-16 sm:h-20">
             {/* Logo */}
             <div className="flex-shrink-0">
-              <img
-                src={Logo}
-                alt="Kitchivo Logo"
-                className="h-8 sm:h-10 w-auto"
-                onError={(e) => {
-                  e.target.onerror = null;
-                  e.target.src = 'https://via.placeholder.com/150x50/66d210/FFFFFF?text=KITCHIVO';
-                }}
-              />
+              <Link to="/">
+                <img
+                  src={Logo}
+                  alt="Kitchivo Logo"
+                  className="h-6 sm:h-10 w-auto cursor-pointer"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = 'https://via.placeholder.com/150x50/66d210/FFFFFF?text=KITCHIVO';
+                  }}
+                />
+              </Link>
             </div>
 
             {/* Desktop Navigation */}
@@ -77,14 +81,115 @@ const Navbar = () => {
                 Home
               </button>
 
-              <div className="relative group">
-                <button className="text-gray-800 hover:text-lima-600 transition-colors duration-300 font-medium flex items-center gap-1">
+              <div className="relative">
+                <button 
+                  onClick={() => setCollectionsDropdownOpen(!collectionsDropdownOpen)}
+                  onMouseEnter={() => setCollectionsDropdownOpen(true)}
+                  onMouseLeave={() => setCollectionsDropdownOpen(false)}
+                  className="text-gray-800 hover:text-lima-600 transition-colors duration-300 font-medium flex items-center gap-1"
+                >
                   Collections
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className={`w-4 h-4 transition-transform duration-300 ${collectionsDropdownOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                   </svg>
                 </button>
+                {/* Full Width Dropdown Menu */}
+                <div 
+                  className={`absolute left-1/2 -translate-x-1/2 top-full mt-2 w-screen max-w-[1400px] transition-all duration-300 z-50 ${collectionsDropdownOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`}
+                  onMouseEnter={() => setCollectionsDropdownOpen(true)}
+                  onMouseLeave={() => setCollectionsDropdownOpen(false)}
+                >
+                  <div className="bg-white rounded-xl shadow-2xl border border-gray-200 mx-6 lg:mx-8">
+                    <div className="p-6 lg:p-8">
+                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 lg:gap-6">
+                        {/* Category 1 */}
+                        <a href="#cookware" className="group/item" onClick={() => setCollectionsDropdownOpen(false)}>
+                          <div className="p-3 lg:p-4 rounded-lg hover:bg-lima-50 transition-all duration-300 text-center">
+                            <h3 className="font-bold text-gray-900 mb-1 group-hover/item:text-lima-700">Cookware</h3>
+                            <p className="text-xs text-gray-500">Pots, Pans & More</p>
+                          </div>
+                        </a>
+
+                        {/* Category 2 */}
+                        <a href="#kitchen-tools" className="group/item" onClick={() => setCollectionsDropdownOpen(false)}>
+                          <div className="p-3 lg:p-4 rounded-lg hover:bg-lima-50 transition-all duration-300 text-center">
+                            <h3 className="font-bold text-gray-900 mb-1 group-hover/item:text-lima-700">Kitchen Tools</h3>
+                            <p className="text-xs text-gray-500">Utensils & Gadgets</p>
+                          </div>
+                        </a>
+
+                        {/* Category 3 */}
+                        <a href="#storage" className="group/item" onClick={() => setCollectionsDropdownOpen(false)}>
+                          <div className="p-3 lg:p-4 rounded-lg hover:bg-lima-50 transition-all duration-300 text-center">
+                            <h3 className="font-bold text-gray-900 mb-1 group-hover/item:text-lima-700">Storage Solutions</h3>
+                            <p className="text-xs text-gray-500">Containers & Organizers</p>
+                          </div>
+                        </a>
+
+                        {/* Category 4 */}
+                        <a href="#dining" className="group/item" onClick={() => setCollectionsDropdownOpen(false)}>
+                          <div className="p-3 lg:p-4 rounded-lg hover:bg-lima-50 transition-all duration-300 text-center">
+                            <h3 className="font-bold text-gray-900 mb-1 group-hover/item:text-lima-700">Dining & Serveware</h3>
+                            <p className="text-xs text-gray-500">Plates, Bowls & Sets</p>
+                          </div>
+                        </a>
+
+                        {/* Category 5 */}
+                        <a href="#home-decor" className="group/item" onClick={() => setCollectionsDropdownOpen(false)}>
+                          <div className="p-3 lg:p-4 rounded-lg hover:bg-lima-50 transition-all duration-300 text-center">
+                            <h3 className="font-bold text-gray-900 mb-1 group-hover/item:text-lima-700">Home Decor</h3>
+                            <p className="text-xs text-gray-500">Style Your Space</p>
+                          </div>
+                        </a>
+
+                        {/* Category 6 */}
+                        <a href="#appliances" className="group/item" onClick={() => setCollectionsDropdownOpen(false)}>
+                          <div className="p-3 lg:p-4 rounded-lg hover:bg-lima-50 transition-all duration-300 text-center">
+                            <h3 className="font-bold text-gray-900 mb-1 group-hover/item:text-lima-700">Appliances</h3>
+                            <p className="text-xs text-gray-500">Smart Kitchen Tech</p>
+                          </div>
+                        </a>
+
+                        {/* Category 7 */}
+                        <a href="#bakeware" className="group/item" onClick={() => setCollectionsDropdownOpen(false)}>
+                          <div className="p-3 lg:p-4 rounded-lg hover:bg-lima-50 transition-all duration-300 text-center">
+                            <h3 className="font-bold text-gray-900 mb-1 group-hover/item:text-lima-700">Bakeware</h3>
+                            <p className="text-xs text-gray-500">Baking Essentials</p>
+                          </div>
+                        </a>
+
+                        {/* Category 8 */}
+                        <a href="#cutlery" className="group/item" onClick={() => setCollectionsDropdownOpen(false)}>
+                          <div className="p-3 lg:p-4 rounded-lg hover:bg-lima-50 transition-all duration-300 text-center">
+                            <h3 className="font-bold text-gray-900 mb-1 group-hover/item:text-lima-700">Cutlery & Knives</h3>
+                            <p className="text-xs text-gray-500">Premium Blades</p>
+                          </div>
+                        </a>
+
+                        {/* Category 9 */}
+                        <a href="#textiles" className="group/item" onClick={() => setCollectionsDropdownOpen(false)}>
+                          <div className="p-3 lg:p-4 rounded-lg hover:bg-lima-50 transition-all duration-300 text-center">
+                            <h3 className="font-bold text-gray-900 mb-1 group-hover/item:text-lima-700">Kitchen Textiles</h3>
+                            <p className="text-xs text-gray-500">Towels & Linens</p>
+                          </div>
+                        </a>
+
+                        {/* Category 10 */}
+                        <a href="#accessories" className="group/item" onClick={() => setCollectionsDropdownOpen(false)}>
+                          <div className="p-3 lg:p-4 rounded-lg hover:bg-lima-50 transition-all duration-300 text-center">
+                            <h3 className="font-bold text-gray-900 mb-1 group-hover/item:text-lima-700">Accessories</h3>
+                            <p className="text-xs text-gray-500">Kitchen Helpers</p>
+                          </div>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
+
+              <a href="#about" className="text-gray-800 hover:text-lima-600 transition-colors duration-300 font-medium">
+                About Us
+              </a>
 
               <a href="#contact" className="text-gray-800 hover:text-lima-600 transition-colors duration-300 font-medium">
                 Contact
@@ -93,12 +198,13 @@ const Navbar = () => {
 
             {/* Right Icons */}
             <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
-              <button className="hidden lg:flex items-center gap-2 text-gray-800 hover:text-lima-600 transition-colors">
+              <Link to="/login" className="flex items-center gap-2 text-gray-800 hover:text-lima-600 transition-colors">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
-                <span className="text-sm">Sign in / Register</span>
-              </button>
+                <span className="hidden lg:inline text-sm">Sign in / Register</span>
+                <span className="lg:hidden text-xs">Sign in</span>
+              </Link>
 
               <button className="relative text-gray-800 hover:text-lima-600 active:text-lima-700 transition-colors">
                 <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -142,10 +248,39 @@ const Navbar = () => {
       </div>
 
       {/* Mobile Menu */}
-      <div className={`lg:hidden overflow-hidden transition-all duration-300 ease-in-out bg-white border-b ${mobileMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
+      <div className={`lg:hidden overflow-hidden transition-all duration-300 ease-in-out bg-white border-b ${mobileMenuOpen ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0'}`}>
         <div className="px-4 pt-2 pb-3 space-y-1">
           <button onClick={() => scrollToSection('home')} className="block w-full text-left px-3 py-2.5 text-gray-800 hover:text-lima-600 active:text-lima-700 hover:bg-gray-50 active:bg-gray-100 rounded-md font-medium text-sm sm:text-base">Home</button>
-          <a href="#collections" className="block px-3 py-2.5 text-gray-800 hover:text-lima-600 active:text-lima-700 hover:bg-gray-50 active:bg-gray-100 rounded-md font-medium text-sm sm:text-base">Collections</a>
+          
+          {/* Collections Dropdown */}
+          <div>
+            <button 
+              onClick={() => setCollectionsDropdown(!collectionsDropdown)}
+              className="flex items-center justify-between w-full px-3 py-2.5 text-gray-800 hover:text-lima-600 active:text-lima-700 hover:bg-gray-50 active:bg-gray-100 rounded-md font-medium text-sm sm:text-base"
+            >
+              Collections
+              <svg className={`w-4 h-4 transition-transform duration-300 ${collectionsDropdown ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            {/* Dropdown Items */}
+            <div className={`overflow-hidden transition-all duration-300 ${collectionsDropdown ? 'max-h-100 opacity-100' : 'max-h-0 opacity-0'}`}>
+              <div className="pl-6 pr-3 py-2 space-y-1">
+                <a href="#cookware" className="block px-3 py-2 text-sm text-gray-700 hover:text-lima-600 hover:bg-lima-50 rounded-md">Cookware</a>
+                <a href="#kitchen-tools" className="block px-3 py-2 text-sm text-gray-700 hover:text-lima-600 hover:bg-lima-50 rounded-md">Kitchen Tools</a>
+                <a href="#storage" className="block px-3 py-2 text-sm text-gray-700 hover:text-lima-600 hover:bg-lima-50 rounded-md">Storage Solutions</a>
+                <a href="#dining" className="block px-3 py-2 text-sm text-gray-700 hover:text-lima-600 hover:bg-lima-50 rounded-md">Dining & Serveware</a>
+                <a href="#home-decor" className="block px-3 py-2 text-sm text-gray-700 hover:text-lima-600 hover:bg-lima-50 rounded-md">Home Decor</a>
+                <a href="#appliances" className="block px-3 py-2 text-sm text-gray-700 hover:text-lima-600 hover:bg-lima-50 rounded-md">Appliances</a>
+                <a href="#bakeware" className="block px-3 py-2 text-sm text-gray-700 hover:text-lima-600 hover:bg-lima-50 rounded-md">Bakeware</a>
+                <a href="#cutlery" className="block px-3 py-2 text-sm text-gray-700 hover:text-lima-600 hover:bg-lima-50 rounded-md">Cutlery & Knives</a>
+                <a href="#textiles" className="block px-3 py-2 text-sm text-gray-700 hover:text-lima-600 hover:bg-lima-50 rounded-md">Kitchen Textiles</a>
+                <a href="#accessories" className="block px-3 py-2 text-sm text-gray-700 hover:text-lima-600 hover:bg-lima-50 rounded-md">Accessories</a>
+              </div>
+            </div>
+          </div>
+
+          <a href="#about" className="block px-3 py-2.5 text-gray-800 hover:text-lima-600 active:text-lima-700 hover:bg-gray-50 active:bg-gray-100 rounded-md font-medium text-sm sm:text-base">About Us</a>
           <a href="#contact" className="block px-3 py-2.5 text-gray-800 hover:text-lima-600 active:text-lima-700 hover:bg-gray-50 active:bg-gray-100 rounded-md font-medium text-sm sm:text-base">Contact</a>
         </div>
       </div>

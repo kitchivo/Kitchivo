@@ -31,7 +31,7 @@ const ProductCard = ({ product }) => {
         </div>
 
         {/* Bottom Buttons - Always visible on mobile, hover on desktop */}
-        <div className="absolute bottom-0 left-0 right-0 flex gap-2 p-2 sm:p-3 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-300 transform translate-y-0 sm:translate-y-4 sm:group-hover:translate-y-0 z-10">
+        <div className="absolute bottom-0 left-0 right-0 flex flex-row gap-2 p-2 sm:p-3 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-300 transform translate-y-0 sm:translate-y-4 sm:group-hover:translate-y-0 z-10">
           <button 
             className="flex-1 bg-gray-900 text-white py-2 sm:py-2.5 px-2 sm:px-4 rounded-md hover:bg-lima-600 active:bg-lima-700 transition-all duration-300 flex items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm font-medium"
             aria-label="Add to Cart"
@@ -39,8 +39,7 @@ const ProductCard = ({ product }) => {
             <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
             </svg>
-            <span className="hidden sm:inline">Add to cart</span>
-            <span className="sm:hidden">Cart</span>
+            <span>Add to cart</span>
           </button>
           <button 
             className="flex-1 bg-gray-900 text-white py-2 sm:py-2.5 px-2 sm:px-4 rounded-md hover:bg-lima-600 active:bg-lima-700 transition-all duration-300 flex items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm font-medium"
@@ -50,8 +49,7 @@ const ProductCard = ({ product }) => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
             </svg>
-            <span className="hidden sm:inline">Quick view</span>
-            <span className="sm:hidden">View</span>
+            <span>Quick view</span>
           </button>
         </div>
       </div>

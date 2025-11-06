@@ -9,6 +9,7 @@ import FAQsSection from "./FAQsSection";
 import FindUsOnSection from "./FindUsOnSection";
 import WhyChooseUsSection from "./WhyChooseUsSection";
 import NewsletterSection from "./NewsletterSection";
+import TestimonialsSection from "./TestimonialsSection";
 
 const Home = () => {
   return (
@@ -19,6 +20,7 @@ const Home = () => {
       <NewInSection />
       <BestsellersSection />
       <WhyChooseUsSection />
+      <TestimonialsSection />
       <FAQsSection />
       <NewsletterSection />
       <FindUsOnSection />

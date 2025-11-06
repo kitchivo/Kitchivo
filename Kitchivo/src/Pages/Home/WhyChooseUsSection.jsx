@@ -89,7 +89,7 @@ const WhyChooseUsSection = () => {
   ];
 
   return (
-    <section className="py-8 sm:py-12 md:py-16 lg:py-24 bg-gray-50">
+    <section className="py-8 sm:py-12 md:py-16 bg-gray-50">
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-8 sm:mb-12 md:mb-16">
           <span className="inline-block px-3 sm:px-4 py-1.5 sm:py-2 bg-lima-100 text-lima-700 rounded-full text-xs sm:text-sm font-semibold mb-3 sm:mb-4 uppercase">
