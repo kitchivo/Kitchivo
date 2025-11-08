@@ -44,7 +44,7 @@ const ProductQuickView = ({ product, isOpen, onClose }) => {
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="sticky top-2 sm:top-4 right-2 sm:right-4 float-right w-8 h-8 sm:w-9 sm:h-9 lg:w-10 lg:h-10 bg-white rounded-full shadow-sm flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-all z-20"
+          className="sticky top-2 sm:top-4 right-2 sm:right-4 float-right w-8 h-8 sm:w-9 cursor-pointer sm:h-9 lg:w-10 lg:h-10 bg-white rounded-full shadow-sm flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-all z-20"
           aria-label="Close"
         >
           <svg className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
