@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
+
 import Logo from "../assets/Logo_Full.png";
+import { allProducts } from '../data/productsData';
 
 const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -49,6 +51,9 @@ const Navbar = () => {
 
   // If mobile menu or search is open, keep navbar visible
   const isNavVisible = showNavbar || mobileMenuOpen || searchOpen;
+
+  // Get unique categories from allProducts
+  const categories = Array.from(new Set(allProducts.map(p => p.category)));
 
   return (
     <nav
@@ -229,165 +234,20 @@ const Navbar = () => {
                   <div className="bg-white rounded-xl shadow-2xl border border-gray-200 mx-6 lg:mx-8">
                     <div className="p-6 lg:p-8">
                       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 lg:gap-6">
-                        {/* Category 1 */}
-                        <a
-                          href="#cookware"
-                          className="group/item"
-                          onClick={() => setCollectionsDropdownOpen(false)}
-                        >
-                          <div className="p-3 lg:p-4 rounded-lg hover:bg-lima-50 transition-all duration-300 text-center">
-                            <h3 className="font-bold text-gray-900 mb-1 group-hover/item:text-lima-700">
-                              Cookware
-                            </h3>
-                            <p className="text-xs text-gray-500">
-                              Pots, Pans & More
-                            </p>
-                          </div>
-                        </a>
-
-                        {/* Category 2 */}
-                        <a
-                          href="#kitchen-tools"
-                          className="group/item"
-                          onClick={() => setCollectionsDropdownOpen(false)}
-                        >
-                          <div className="p-3 lg:p-4 rounded-lg hover:bg-lima-50 transition-all duration-300 text-center">
-                            <h3 className="font-bold text-gray-900 mb-1 group-hover/item:text-lima-700">
-                              Kitchen Tools
-                            </h3>
-                            <p className="text-xs text-gray-500">
-                              Utensils & Gadgets
-                            </p>
-                          </div>
-                        </a>
-
-                        {/* Category 3 */}
-                        <a
-                          href="#storage"
-                          className="group/item"
-                          onClick={() => setCollectionsDropdownOpen(false)}
-                        >
-                          <div className="p-3 lg:p-4 rounded-lg hover:bg-lima-50 transition-all duration-300 text-center">
-                            <h3 className="font-bold text-gray-900 mb-1 group-hover/item:text-lima-700">
-                              Storage Solutions
-                            </h3>
-                            <p className="text-xs text-gray-500">
-                              Containers & Organizers
-                            </p>
-                          </div>
-                        </a>
-
-                        {/* Category 4 */}
-                        <a
-                          href="#dining"
-                          className="group/item"
-                          onClick={() => setCollectionsDropdownOpen(false)}
-                        >
-                          <div className="p-3 lg:p-4 rounded-lg hover:bg-lima-50 transition-all duration-300 text-center">
-                            <h3 className="font-bold text-gray-900 mb-1 group-hover/item:text-lima-700">
-                              Dining & Serveware
-                            </h3>
-                            <p className="text-xs text-gray-500">
-                              Plates, Bowls & Sets
-                            </p>
-                          </div>
-                        </a>
-
-                        {/* Category 5 */}
-                        <a
-                          href="#home-decor"
-                          className="group/item"
-                          onClick={() => setCollectionsDropdownOpen(false)}
-                        >
-                          <div className="p-3 lg:p-4 rounded-lg hover:bg-lima-50 transition-all duration-300 text-center">
-                            <h3 className="font-bold text-gray-900 mb-1 group-hover/item:text-lima-700">
-                              Home Decor
-                            </h3>
-                            <p className="text-xs text-gray-500">
-                              Style Your Space
-                            </p>
-                          </div>
-                        </a>
-
-                        {/* Category 6 */}
-                        <a
-                          href="#appliances"
-                          className="group/item"
-                          onClick={() => setCollectionsDropdownOpen(false)}
-                        >
-                          <div className="p-3 lg:p-4 rounded-lg hover:bg-lima-50 transition-all duration-300 text-center">
-                            <h3 className="font-bold text-gray-900 mb-1 group-hover/item:text-lima-700">
-                              Appliances
-                            </h3>
-                            <p className="text-xs text-gray-500">
-                              Smart Kitchen Tech
-                            </p>
-                          </div>
-                        </a>
-
-                        {/* Category 7 */}
-                        <a
-                          href="#bakeware"
-                          className="group/item"
-                          onClick={() => setCollectionsDropdownOpen(false)}
-                        >
-                          <div className="p-3 lg:p-4 rounded-lg hover:bg-lima-50 transition-all duration-300 text-center">
-                            <h3 className="font-bold text-gray-900 mb-1 group-hover/item:text-lima-700">
-                              Bakeware
-                            </h3>
-                            <p className="text-xs text-gray-500">
-                              Baking Essentials
-                            </p>
-                          </div>
-                        </a>
-
-                        {/* Category 8 */}
-                        <a
-                          href="#cutlery"
-                          className="group/item"
-                          onClick={() => setCollectionsDropdownOpen(false)}
-                        >
-                          <div className="p-3 lg:p-4 rounded-lg hover:bg-lima-50 transition-all duration-300 text-center">
-                            <h3 className="font-bold text-gray-900 mb-1 group-hover/item:text-lima-700">
-                              Cutlery & Knives
-                            </h3>
-                            <p className="text-xs text-gray-500">
-                              Premium Blades
-                            </p>
-                          </div>
-                        </a>
-
-                        {/* Category 9 */}
-                        <a
-                          href="#textiles"
-                          className="group/item"
-                          onClick={() => setCollectionsDropdownOpen(false)}
-                        >
-                          <div className="p-3 lg:p-4 rounded-lg hover:bg-lima-50 transition-all duration-300 text-center">
-                            <h3 className="font-bold text-gray-900 mb-1 group-hover/item:text-lima-700">
-                              Kitchen Textiles
-                            </h3>
-                            <p className="text-xs text-gray-500">
-                              Towels & Linens
-                            </p>
-                          </div>
-                        </a>
-
-                        {/* Category 10 */}
-                        <a
-                          href="#accessories"
-                          className="group/item"
-                          onClick={() => setCollectionsDropdownOpen(false)}
-                        >
-                          <div className="p-3 lg:p-4 rounded-lg hover:bg-lima-50 transition-all duration-300 text-center">
-                            <h3 className="font-bold text-gray-900 mb-1 group-hover/item:text-lima-700">
-                              Accessories
-                            </h3>
-                            <p className="text-xs text-gray-500">
-                              Kitchen Helpers
-                            </p>
-                          </div>
-                        </a>
+                        {categories.map((cat) => (
+                          <Link
+                            key={cat}
+                            to={`/category/${cat.replace(/\s+/g, '-').toLowerCase()}`}
+                            className="group/item"
+                            onClick={() => setCollectionsDropdownOpen(false)}
+                          >
+                            <div className="p-3 lg:p-4 rounded-lg hover:bg-lima-50 transition-all duration-300 text-center">
+                              <h3 className="font-bold text-gray-900 mb-1 group-hover/item:text-lima-700">
+                                {cat}
+                              </h3>
+                            </div>
+                          </Link>
+                        ))}
                       </div>
                     </div>
                   </div>

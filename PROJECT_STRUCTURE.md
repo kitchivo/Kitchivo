@@ -29,7 +29,7 @@ Kitchivo/
 │   ├── assets/              # Additional assets (images, fonts, etc.)
 │   ├── components/          # Reusable UI components
 │   │   ├── Footer.jsx       # Footer component
-│   │   ├── Navbar.jsx       # Navigation bar component
+│   │   ├── Navbar.jsx       # Navigation bar component (dynamic Collections dropdown)
 │   │   └── ProductCard.jsx  # Product card component (reusable)
 │   └── Pages/               # Page-level components, organized by feature
 │       ├── Auth/            # Authentication pages
@@ -58,7 +58,11 @@ Kitchivo/
 │           └── Wishlist.jsx
 ```
 
+
 ## Key Features
+
+### Dynamic Collections Dropdown
+The Navbar's "Collections" dropdown now automatically displays all product categories from the product data. Any new category added to the data will instantly appear in the dropdown, ensuring the menu is always up-to-date.
 
 ### Routing
 The application uses React Router DOM with the following routes:
@@ -139,6 +143,7 @@ The application uses React Router DOM with the following routes:
   - ✅ "New Products" link in mobile menu
   - ✅ Changed "New Product" to "New Products"
   - ✅ Both links use React Router Link component
+  - ✅ Collections dropdown now shows all categories from product data automatically
 - ✅ Enhanced Products page with CategoryProducts design:
   - ✅ Added Breadcrumb navigation
   - ✅ Implemented sidebar filter layout (Category, Sort, Price Range)
