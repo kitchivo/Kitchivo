@@ -8,19 +8,19 @@ const FindUsOnSection = () => {
     {
       name: 'Amazon',
       logo: amazonLogo,
-      link: '#',
+      link: 'https://www.amazon.in/',
       tagline: 'Prime shipping and exclusive kitchen deals'
     },
     {
       name: 'Myntra',
       logo: myntraLogo,
-      link: '#',
+      link: 'https://www.myntra.com/',
       tagline: 'Curated cookware for trendsetters'
     },
     {
       name: 'Flipkart',
       logo: flipkartLogo,
-      link: '#',
+      link: 'https://www.flipkart.com/',
       tagline: 'Festive offers on smart appliances'
     }
   ];

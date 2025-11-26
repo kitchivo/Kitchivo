@@ -3,8 +3,12 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import Logo from "../assets/Logo_Full.png";
 import { allProducts } from '../data/productsData';
+import { useSelector } from "react-redux";
 
 const Navbar = () => {
+
+  const token = localStorage.getItem("token");
+  const { user } = useSelector((state) => state.authStore);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [shopDropdown, setShopDropdown] = useState(false);
   const [pagesDropdown, setPagesDropdown] = useState(false);
@@ -68,9 +72,8 @@ const Navbar = () => {
 
   return (
     <nav
-      className={`sticky top-0 z-50 bg-white shadow-sm transform transition-transform duration-300 ${
-        isNavVisible ? "translate-y-0" : "-translate-y-full"
-      }`}
+      className={`sticky top-0 z-50 bg-white shadow-sm transform transition-transform duration-300 ${isNavVisible ? "translate-y-0" : "-translate-y-full"
+        }`}
     >
       {/* Top Bar - Hidden on mobile, visible on sm and up */}
       <div className="hidden md:block bg-gray-100 border-b border-gray-200">
@@ -192,12 +195,12 @@ const Navbar = () => {
                 Home
               </button>
 
-              <Link
+              {/* <Link
                 to="/new-products"
                 className="text-gray-800 hover:text-lima-600 transition-colors duration-300 font-medium"
               >
                 New Products
-              </Link>
+              </Link> */}
 
               <Link
                 to="/products"
@@ -217,9 +220,8 @@ const Navbar = () => {
                 >
                   Collections
                   <svg
-                    className={`w-4 h-4 transition-transform duration-300 ${
-                      collectionsDropdownOpen ? "rotate-180" : ""
-                    }`}
+                    className={`w-4 h-4 transition-transform duration-300 ${collectionsDropdownOpen ? "rotate-180" : ""
+                      }`}
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -234,11 +236,10 @@ const Navbar = () => {
                 </button>
                 {/* Full Width Dropdown Menu */}
                 <div
-                  className={`absolute left-1/2 -translate-x-1/2 top-full mt-2 w-screen max-w-[1400px] transition-all duration-300 z-50 ${
-                    collectionsDropdownOpen
-                      ? "opacity-100 visible"
-                      : "opacity-0 invisible"
-                  }`}
+                  className={`absolute left-1/2 -translate-x-1/2 top-full mt-2 w-screen max-w-[1400px] transition-all duration-300 z-50 ${collectionsDropdownOpen
+                    ? "opacity-100 visible"
+                    : "opacity-0 invisible"
+                    }`}
                   onMouseEnter={() => setCollectionsDropdownOpen(true)}
                   onMouseLeave={() => setCollectionsDropdownOpen(false)}
                 >
@@ -267,99 +268,185 @@ const Navbar = () => {
             </div>
 
             {/* Right Icons */}
-            <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
-              <Link
-                to="/login"
-                className="flex items-center gap-2 text-gray-800 hover:text-lima-600 transition-colors"
-              >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+            {token ?
+              <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
+                {/* <Link
+                  to="/login"
+                  className="flex items-center gap-2 text-gray-800 hover:text-lima-600 transition-colors"
+                > */}
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                    />
+                  </svg>
+                  <span className="hidden lg:inline text-sm">
+                    {user && user?.name ? `Hi, ${user?.name}` : "Sign in / Register"}
+                  </span>
+                  <span className="lg:hidden text-xs">Sign in</span>
+                {/* </Link> */}
+
+                <Link to="/wishlist" className="relative text-gray-800 hover:text-lima-600 active:text-lima-700 transition-colors">
+                  <svg
+                    className="w-5 h-5 sm:w-6 sm:h-6"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                    />
+                  </svg>
+                  <span className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 bg-lima-600 text-white text-xs rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center">
+                    {user && user?.wishlist ? user?.wishlist.length : 0}
+                  </span>
+                </Link>
+
+                <button
+                  onClick={() => setSearchOpen(true)}
+                  className="text-gray-800 hover:text-lima-600 active:text-lima-700 transition-colors"
                 >
-                  <path
+                  <svg
+                    className="w-5 h-5 sm:w-6 sm:h-6"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
+                </button>
+
+                {/* Mobile Menu Button */}
+                <button
+                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                  className="lg:hidden text-gray-800 hover:text-lima-600 active:text-lima-700 focus:outline-none"
+                >
+                  <svg
+                    className="h-6 w-6"
+                    fill="none"
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth="2"
-                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                  />
-                </svg>
-                <span className="hidden lg:inline text-sm">
-                  Sign in / Register
-                </span>
-                <span className="lg:hidden text-xs">Sign in</span>
-              </Link>
-
-              <Link to="/wishlist" className="relative text-gray-800 hover:text-lima-600 active:text-lima-700 transition-colors">
-                <svg
-                  className="w-5 h-5 sm:w-6 sm:h-6"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    {mobileMenuOpen ? (
+                      <path d="M6 18L18 6M6 6l12 12" />
+                    ) : (
+                      <path d="M4 6h16M4 12h16M4 18h16" />
+                    )}
+                  </svg>
+                </button>
+              </div>
+              :
+              <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
+                <Link
+                  to="/login"
+                  className="flex items-center gap-2 text-gray-800 hover:text-lima-600 transition-colors"
                 >
-                  <path
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                    />
+                  </svg>
+                  <span className="hidden lg:inline text-sm">
+                    Sign in / Register
+                  </span>
+                  <span className="lg:hidden text-xs">Sign in</span>
+                </Link>
+
+                <Link to="/wishlist" className="relative text-gray-800 hover:text-lima-600 active:text-lima-700 transition-colors">
+                  <svg
+                    className="w-5 h-5 sm:w-6 sm:h-6"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                    />
+                  </svg>
+                  <span className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 bg-lima-600 text-white text-xs rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center">
+                    0
+                  </span>
+                </Link>
+
+                <button
+                  onClick={() => setSearchOpen(true)}
+                  className="text-gray-800 hover:text-lima-600 active:text-lima-700 transition-colors"
+                >
+                  <svg
+                    className="w-5 h-5 sm:w-6 sm:h-6"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
+                </button>
+
+                {/* Mobile Menu Button */}
+                <button
+                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                  className="lg:hidden text-gray-800 hover:text-lima-600 active:text-lima-700 focus:outline-none"
+                >
+                  <svg
+                    className="h-6 w-6"
+                    fill="none"
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth="2"
-                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                  />
-                </svg>
-                <span className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 bg-lima-600 text-white text-xs rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center">
-                  0
-                </span>
-              </Link>
-
-              <button
-                onClick={() => setSearchOpen(true)}
-                className="text-gray-800 hover:text-lima-600 active:text-lima-700 transition-colors"
-              >
-                <svg
-                  className="w-5 h-5 sm:w-6 sm:h-6"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                  />
-                </svg>
-              </button>
-
-              {/* Mobile Menu Button */}
-              <button
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="lg:hidden text-gray-800 hover:text-lima-600 active:text-lima-700 focus:outline-none"
-              >
-                <svg
-                  className="h-6 w-6"
-                  fill="none"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  {mobileMenuOpen ? (
-                    <path d="M6 18L18 6M6 6l12 12" />
-                  ) : (
-                    <path d="M4 6h16M4 12h16M4 18h16" />
-                  )}
-                </svg>
-              </button>
-            </div>
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    {mobileMenuOpen ? (
+                      <path d="M6 18L18 6M6 6l12 12" />
+                    ) : (
+                      <path d="M4 6h16M4 12h16M4 18h16" />
+                    )}
+                  </svg>
+                </button>
+              </div>
+            }
           </div>
         </div>
       </div>
 
       {/* Mobile Menu */}
       <div
-        className={`lg:hidden overflow-hidden transition-all duration-300 ease-in-out bg-white border-b ${
-          mobileMenuOpen ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0"
-        }`}
+        className={`lg:hidden overflow-hidden transition-all duration-300 ease-in-out bg-white border-b ${mobileMenuOpen ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0"
+          }`}
       >
         <div className="px-4 pt-2 pb-3 space-y-1">
           <button
@@ -393,9 +480,8 @@ const Navbar = () => {
             >
               Collections
               <svg
-                className={`w-4 h-4 transition-transform duration-300 ${
-                  collectionsDropdown ? "rotate-180" : ""
-                }`}
+                className={`w-4 h-4 transition-transform duration-300 ${collectionsDropdown ? "rotate-180" : ""
+                  }`}
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -410,11 +496,10 @@ const Navbar = () => {
             </button>
             {/* Dropdown Items */}
             <div
-              className={`overflow-hidden transition-all duration-300 ${
-                collectionsDropdown
-                  ? "max-h-100 opacity-100"
-                  : "max-h-0 opacity-0"
-              }`}
+              className={`overflow-hidden transition-all duration-300 ${collectionsDropdown
+                ? "max-h-100 opacity-100"
+                : "max-h-0 opacity-0"
+                }`}
             >
               <div className="pl-6 pr-3 py-2 space-y-1">
                 <a

@@ -142,7 +142,7 @@ const Footer = () => {
               </a>
             </div>
             {/* Currency Selector */}
-            <div className="mt-6">
+            {/* <div className="mt-6">
               <p className="text-gray-800 text-xs sm:text-sm font-semibold mb-2">
                 Preferred Currency
               </p>
@@ -204,7 +204,7 @@ const Footer = () => {
               <p className="text-gray-600 text-[11px] sm:text-xs mt-2">
                 Prices update automatically across the site.
               </p>
-            </div>
+            </div> */}
           </div>
 
           {/* Column 2 - Shop */}

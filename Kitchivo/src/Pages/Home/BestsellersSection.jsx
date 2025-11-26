@@ -3,18 +3,19 @@ import { Link } from 'react-router-dom';
 import ProductCard from '../../components/ProductCard';
 import { getBestsellers } from '../../data/productsData';
 
-const BestsellersSection = () => {
+const BestsellersSection = ({ products = [] }) => {
   const scrollContainerRef = useRef(null);
 
   const scroll = (direction) => {
     const container = scrollContainerRef.current;
     if (container) {
-      const scrollAmount = direction === 'left' ? -400 : 400;
-      container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+      const scrollAmount = direction === "left" ? -400 : 400;
+      container.scrollBy({ left: scrollAmount, behavior: "smooth" });
     }
   };
 
-  const products = getBestsellers();
+  // If no products, don't render empty section
+  if (!products || products.length === 0) return null;
 
   return (
     <section id="products" className="py-8 sm:py-12 md:py-16 bg-white">
@@ -65,7 +66,11 @@ const BestsellersSection = () => {
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             {products.map((product) => (
-              <div key={product.id} className="flex-none w-[280px] sm:w-[calc(50%-12px)] md:w-[calc(33.333%-16px)] lg:w-[calc(26%-18px)] snap-start">
+              <div
+                key={product.id}
+                className="flex-none w-[280px] sm:w-[calc(50%-12px)] md:w-[calc(33.333%-16px)] 
+                lg:w-[calc(26%-18px)] snap-start"
+              >
                 <ProductCard product={product} />
               </div>
             ))}

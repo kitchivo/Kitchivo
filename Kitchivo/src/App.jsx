@@ -13,8 +13,22 @@ import Products from './Pages/Products/Products';
 import NewProducts from './Pages/NewProducts/NewProducts';
 import PrivacyPolicy from './Pages/PrivacyPolicy/PrivacyPolicy';
 import TermsOfService from './Pages/TermsOfService/TermsOfService';
+import { useDispatch } from 'react-redux';
+import { getProfile } from './redux/slices/AuthSlice';
+import { useEffect } from 'react';
+import { getDashboard } from './redux/slices/CommanSlice';
 
 function App() {
+  const dispatch = useDispatch();
+  const token = localStorage.getItem("token");
+  useEffect(() => {
+    dispatch(getDashboard());
+    if (token) {
+      dispatch(getProfile());
+    }
+  }, [token]);
+
+
   return (
     <Routes>
       <Route path="/" element={<Home />} />
@@ -29,8 +43,8 @@ function App() {
       <Route path="/contact" element={<Contact />} />
       <Route path="/category/:categoryName" element={<CategoryProducts />} />
       <Route path="/product/:id" element={<ProductDetail />} />
-        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-        <Route path="/terms-of-service" element={<TermsOfService />} />
+      <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+      <Route path="/terms-of-service" element={<TermsOfService />} />
     </Routes>
   );
 }
