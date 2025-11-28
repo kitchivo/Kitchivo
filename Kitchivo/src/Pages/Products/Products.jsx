@@ -1,59 +1,94 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import Breadcrumb from '../../components/Breadcrumb';
 import ProductCard from '../../components/ProductCard';
-import { allProducts } from '../../data/productsData';
+import { fetchAllProducts, createWishlist } from '../../redux/slices/CommanSlice';
+import { toast } from 'react-toastify';
+import Swal from 'sweetalert2';
+import { getProfile } from '../../redux/slices/AuthSlice';
 
 const Products = () => {
-  const [selectedCategory, setSelectedCategory] = useState('All');
+  const dispatch = useDispatch();
+  const { loading, products, pagination, error } = useSelector(
+    (state) => state.commanStore
+  );
+  const { dashboard } = useSelector((state) => state.commanStore);
+  const navigate = useNavigate();
+
+  const [selectedCategory, setSelectedCategory] = useState('');
   const [sortBy, setSortBy] = useState('featured');
-  const [priceRange, setPriceRange] = useState('all');
+  const [priceRange, setPriceRange] = useState('');
   const [sortDropdownOpen, setSortDropdownOpen] = useState(false);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
-  const categories = ['All', 'Storage', 'Cookware', 'Dinnerware', 'Drinkware', 'Kitchen Tools', 'Home Decor'];
+  const categories = dashboard?.categories?.filter((cat) => cat.status) || [];
 
-  // Filter products by category
-  const filteredProducts = selectedCategory === 'All' 
-    ? allProducts 
-    : allProducts.filter(product => product.category === selectedCategory);
+  const currentFilters = {
+    page: 1,
+    search: "",
+    category_id: selectedCategory || "",
+    sortBy: sortBy === 'featured' ? '' : sortBy,
+    priceRange,
+  };
 
-  // Apply price range filter
-  const priceFilteredProducts = filteredProducts.filter(product => {
-    const price = parseInt(product.price.replace(/[^0-9]/g, ''));
-    
-    if (priceRange === 'under-1000') return price < 1000;
-    if (priceRange === '1000-5000') return price >= 1000 && price < 5000;
-    if (priceRange === '5000-10000') return price >= 5000 && price < 10000;
-    if (priceRange === 'above-10000') return price >= 10000;
-    return true; // 'all'
-  });
+  useEffect(() => {
+    dispatch(
+      fetchAllProducts(currentFilters)
+    );
+  }, [dispatch, selectedCategory, sortBy, priceRange]);
 
-  // Sort products
-  const sortedProducts = [...priceFilteredProducts].sort((a, b) => {
-    switch (sortBy) {
-      case 'price-low':
-        return parseInt(a.price.replace(/[^0-9]/g, '')) - parseInt(b.price.replace(/[^0-9]/g, ''));
-      case 'price-high':
-        return parseInt(b.price.replace(/[^0-9]/g, '')) - parseInt(a.price.replace(/[^0-9]/g, ''));
-      case 'rating':
-        return (b.rating || 0) - (a.rating || 0);
-      case 'newest':
-        return (b.badge === 'New' ? 1 : 0) - (a.badge === 'New' ? 1 : 0);
-      case 'name':
-        return a.name.localeCompare(b.name);
-      default:
-        return 0;
+  const handleAddToWishlist = async (product) => {
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+      Swal.fire({
+        title: 'Login required',
+        text: 'Please login first to add products to your wishlist.',
+        icon: 'warning',
+        confirmButtonText: 'Login',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          navigate('/login');
+        }
+      });
+      return;
     }
-  });
+
+    // if (product?.is_wishlisted) {
+    //   return;
+    // }
+
+    const productId = product?.id;
+    if (!productId) {
+      return;
+    }
+
+    try {
+      const resultAction = await dispatch(createWishlist({ product_id: productId }));
+      console.log("resultAction", resultAction)
+      if (resultAction?.payload?.status == 1) {
+        toast.success(resultAction?.payload?.message || 'Added to wishlist');
+        dispatch(fetchAllProducts(currentFilters));
+        dispatch(getProfile());
+      } else {
+        toast.error(resultAction?.payload?.message || 'Failed to add to wishlist');
+      }
+    } catch (error) {
+      toast.error('Failed to add to wishlist');
+    }
+  };
+
+  const filteredProducts = Array.isArray(products) ? products : [];
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar /> 
-      
-      <Breadcrumb 
+      <Navbar />
+
+      <Breadcrumb
         items={[
           { label: 'Home', href: '/' },
           { label: 'All Products' }
@@ -64,7 +99,7 @@ const Products = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
         {/* Header */}
         <div className="mb-8">
-          <motion.h1 
+          <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
@@ -74,9 +109,9 @@ const Products = () => {
           </motion.h1>
           <div className="flex items-center justify-between">
             <p className="text-sm sm:text-base text-gray-600">
-              {sortedProducts.length} {sortedProducts.length === 1 ? 'product' : 'products'} found
+              {filteredProducts.length} {filteredProducts.length === 1 ? 'product' : 'products'} found
             </p>
-            
+
             {/* Mobile Filter Button */}
             <button
               onClick={() => setMobileFiltersOpen(true)}
@@ -100,17 +135,28 @@ const Products = () => {
               <div className="mb-6">
                 <h3 className="text-sm font-semibold text-gray-700 mb-3">Category</h3>
                 <div className="space-y-2">
+                  <label key="all" className="flex items-center cursor-pointer">
+                    <input
+                      type="radio"
+                      name="category"
+                      value=""
+                      checked={selectedCategory === ''}
+                      onChange={(e) => setSelectedCategory(e.target.value)}
+                      className="w-4 h-4 text-lima-600 focus:ring-lima-600"
+                    />
+                    <span className="ml-2 text-sm text-gray-700">All</span>
+                  </label>
                   {categories.map((category) => (
-                    <label key={category} className="flex items-center cursor-pointer">
+                    <label key={category.id} className="flex items-center cursor-pointer">
                       <input
                         type="radio"
                         name="category"
-                        value={category}
-                        checked={selectedCategory === category}
+                        value={category.id}
+                        checked={selectedCategory === String(category.id)}
                         onChange={(e) => setSelectedCategory(e.target.value)}
                         className="w-4 h-4 text-lima-600 focus:ring-lima-600"
                       />
-                      <span className="ml-2 text-sm text-gray-700">{category}</span>
+                      <span className="ml-2 text-sm text-gray-700">{category.name}</span>
                     </label>
                   ))}
                 </div>
@@ -127,15 +173,15 @@ const Products = () => {
                     <span className="font-medium">
                       {sortBy === 'featured' && 'Featured'}
                       {sortBy === 'newest' && 'Newest First'}
-                      {sortBy === 'price-low' && 'Price: Low to High'}
-                      {sortBy === 'price-high' && 'Price: High to Low'}
-                      {sortBy === 'rating' && 'Highest Rated'}
-                      {sortBy === 'name' && 'Name: A to Z'}
+                      {sortBy === 'price_low_to_high' && 'Price: Low to High'}
+                      {sortBy === 'price_high_to_low' && 'Price: High to Low'}
+                      {sortBy === 'high_rating' && 'Highest Rated'}
+                      {sortBy === 'name_a_to_z' && 'Name: A to Z'}
                     </span>
-                    <svg 
+                    <svg
                       className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${sortDropdownOpen ? 'rotate-180' : ''}`}
-                      fill="none" 
-                      stroke="currentColor" 
+                      fill="none"
+                      stroke="currentColor"
                       viewBox="0 0 24 24"
                     >
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
@@ -146,11 +192,11 @@ const Products = () => {
                   {sortDropdownOpen && (
                     <>
                       {/* Backdrop */}
-                      <div 
-                        className="fixed inset-0 z-10" 
+                      <div
+                        className="fixed inset-0 z-10"
                         onClick={() => setSortDropdownOpen(false)}
                       />
-                      
+
                       {/* Dropdown List */}
                       <div className="absolute z-20 w-full mt-2 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden">
                         <button
@@ -158,9 +204,8 @@ const Products = () => {
                             setSortBy('featured');
                             setSortDropdownOpen(false);
                           }}
-                          className={`w-full px-4 py-2.5 text-left text-sm hover:bg-lima-50 transition-colors ${
-                            sortBy === 'featured' ? 'bg-lima-50 text-lima-700 font-semibold' : 'text-gray-700'
-                          }`}
+                          className={`w-full px-4 py-2.5 text-left text-sm hover:bg-lima-50 transition-colors ${sortBy === 'featured' ? 'bg-lima-50 text-lima-700 font-semibold' : 'text-gray-700'
+                            }`}
                         >
                           <div className="flex items-center justify-between">
                             <span>Featured</span>
@@ -176,9 +221,8 @@ const Products = () => {
                             setSortBy('newest');
                             setSortDropdownOpen(false);
                           }}
-                          className={`w-full px-4 py-2.5 text-left text-sm hover:bg-lima-50 transition-colors ${
-                            sortBy === 'newest' ? 'bg-lima-50 text-lima-700 font-semibold' : 'text-gray-700'
-                          }`}
+                          className={`w-full px-4 py-2.5 text-left text-sm hover:bg-lima-50 transition-colors ${sortBy === 'newest' ? 'bg-lima-50 text-lima-700 font-semibold' : 'text-gray-700'
+                            }`}
                         >
                           <div className="flex items-center justify-between">
                             <span>Newest First</span>
@@ -191,16 +235,15 @@ const Products = () => {
                         </button>
                         <button
                           onClick={() => {
-                            setSortBy('price-low');
+                            setSortBy('price_low_to_high');
                             setSortDropdownOpen(false);
                           }}
-                          className={`w-full px-4 py-2.5 text-left text-sm hover:bg-lima-50 transition-colors ${
-                            sortBy === 'price-low' ? 'bg-lima-50 text-lima-700 font-semibold' : 'text-gray-700'
-                          }`}
+                          className={`w-full px-4 py-2.5 text-left text-sm hover:bg-lima-50 transition-colors ${sortBy === 'price_low_to_high' ? 'bg-lima-50 text-lima-700 font-semibold' : 'text-gray-700'
+                            }`}
                         >
                           <div className="flex items-center justify-between">
                             <span>Price: Low to High</span>
-                            {sortBy === 'price-low' && (
+                            {sortBy === 'price_low_to_high' && (
                               <svg className="w-4 h-4 text-lima-600" fill="currentColor" viewBox="0 0 20 20">
                                 <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                               </svg>
@@ -209,16 +252,15 @@ const Products = () => {
                         </button>
                         <button
                           onClick={() => {
-                            setSortBy('price-high');
+                            setSortBy('price_high_to_low');
                             setSortDropdownOpen(false);
                           }}
-                          className={`w-full px-4 py-2.5 text-left text-sm hover:bg-lima-50 transition-colors ${
-                            sortBy === 'price-high' ? 'bg-lima-50 text-lima-700 font-semibold' : 'text-gray-700'
-                          }`}
+                          className={`w-full px-4 py-2.5 text-left text-sm hover:bg-lima-50 transition-colors ${sortBy === 'price_high_to_low' ? 'bg-lima-50 text-lima-700 font-semibold' : 'text-gray-700'
+                            }`}
                         >
                           <div className="flex items-center justify-between">
                             <span>Price: High to Low</span>
-                            {sortBy === 'price-high' && (
+                            {sortBy === 'price_high_to_low' && (
                               <svg className="w-4 h-4 text-lima-600" fill="currentColor" viewBox="0 0 20 20">
                                 <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                               </svg>
@@ -227,16 +269,15 @@ const Products = () => {
                         </button>
                         <button
                           onClick={() => {
-                            setSortBy('rating');
+                            setSortBy('high_rating');
                             setSortDropdownOpen(false);
                           }}
-                          className={`w-full px-4 py-2.5 text-left text-sm hover:bg-lima-50 transition-colors ${
-                            sortBy === 'rating' ? 'bg-lima-50 text-lima-700 font-semibold' : 'text-gray-700'
-                          }`}
+                          className={`w-full px-4 py-2.5 text-left text-sm hover:bg-lima-50 transition-colors ${sortBy === 'high_rating' ? 'bg-lima-50 text-lima-700 font-semibold' : 'text-gray-700'
+                            }`}
                         >
                           <div className="flex items-center justify-between">
                             <span>Highest Rated</span>
-                            {sortBy === 'rating' && (
+                            {sortBy === 'high_rating' && (
                               <svg className="w-4 h-4 text-lima-600" fill="currentColor" viewBox="0 0 20 20">
                                 <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                               </svg>
@@ -245,16 +286,15 @@ const Products = () => {
                         </button>
                         <button
                           onClick={() => {
-                            setSortBy('name');
+                            setSortBy('name_a_to_z');
                             setSortDropdownOpen(false);
                           }}
-                          className={`w-full px-4 py-2.5 text-left text-sm hover:bg-lima-50 transition-colors ${
-                            sortBy === 'name' ? 'bg-lima-50 text-lima-700 font-semibold' : 'text-gray-700'
-                          }`}
+                          className={`w-full px-4 py-2.5 text-left text-sm hover:bg-lima-50 transition-colors ${sortBy === 'name_a_to_z' ? 'bg-lima-50 text-lima-700 font-semibold' : 'text-gray-700'
+                            }`}
                         >
                           <div className="flex items-center justify-between">
                             <span>Name: A to Z</span>
-                            {sortBy === 'name' && (
+                            {sortBy === 'name_a_to_z' && (
                               <svg className="w-4 h-4 text-lima-600" fill="currentColor" viewBox="0 0 20 20">
                                 <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                               </svg>
@@ -275,8 +315,8 @@ const Products = () => {
                     <input
                       type="radio"
                       name="price"
-                      value="all"
-                      checked={priceRange === 'all'}
+                      value=""
+                      checked={priceRange === ''}
                       onChange={(e) => setPriceRange(e.target.value)}
                       className="w-4 h-4 text-lima-600 focus:ring-lima-600"
                     />
@@ -332,9 +372,9 @@ const Products = () => {
               {/* Reset Filters */}
               <button
                 onClick={() => {
-                  setSelectedCategory('All');
+                  setSelectedCategory('');
                   setSortBy('featured');
-                  setPriceRange('all');
+                  setPriceRange('');
                 }}
                 className="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
               >
@@ -346,11 +386,11 @@ const Products = () => {
           {/* Mobile Filters Sidebar - Slide-in */}
           <div className={`lg:hidden fixed inset-0 z-50 transform transition-transform duration-300 ${mobileFiltersOpen ? 'translate-x-0' : '-translate-x-full'}`}>
             {/* Backdrop */}
-            <div 
+            <div
               className="absolute inset-0 bg-black/50"
               onClick={() => setMobileFiltersOpen(false)}
             />
-            
+
             {/* Sidebar */}
             <div className="absolute left-0 top-0 bottom-0 w-[280px] sm:w-[320px] bg-white shadow-xl overflow-y-auto">
               {/* Header */}
@@ -372,17 +412,28 @@ const Products = () => {
                 <div className="mb-6">
                   <h3 className="text-sm font-semibold text-gray-700 mb-3">Category</h3>
                   <div className="space-y-2">
+                    <label key="mobile-all" className="flex items-center cursor-pointer">
+                      <input
+                        type="radio"
+                        name="mobile-category"
+                        value=""
+                        checked={selectedCategory === ''}
+                        onChange={(e) => setSelectedCategory(e.target.value)}
+                        className="w-4 h-4 text-lima-600 focus:ring-lima-600"
+                      />
+                      <span className="ml-2 text-sm text-gray-700">All</span>
+                    </label>
                     {categories.map((category) => (
-                      <label key={category} className="flex items-center cursor-pointer">
+                      <label key={category.id} className="flex items-center cursor-pointer">
                         <input
                           type="radio"
                           name="mobile-category"
-                          value={category}
-                          checked={selectedCategory === category}
+                          value={category.id}
+                          checked={selectedCategory === String(category.id)}
                           onChange={(e) => setSelectedCategory(e.target.value)}
                           className="w-4 h-4 text-lima-600 focus:ring-lima-600"
                         />
-                        <span className="ml-2 text-sm text-gray-700">{category}</span>
+                        <span className="ml-2 text-sm text-gray-700">{category.name}</span>
                       </label>
                     ))}
                   </div>
@@ -418,8 +469,8 @@ const Products = () => {
                       <input
                         type="radio"
                         name="mobile-sort"
-                        value="price-low"
-                        checked={sortBy === 'price-low'}
+                        value="price_low_to_high"
+                        checked={sortBy === 'price_low_to_high'}
                         onChange={(e) => setSortBy(e.target.value)}
                         className="w-4 h-4 text-lima-600 focus:ring-lima-600"
                       />
@@ -429,8 +480,8 @@ const Products = () => {
                       <input
                         type="radio"
                         name="mobile-sort"
-                        value="price-high"
-                        checked={sortBy === 'price-high'}
+                        value="price_high_to_low"
+                        checked={sortBy === 'price_high_to_low'}
                         onChange={(e) => setSortBy(e.target.value)}
                         className="w-4 h-4 text-lima-600 focus:ring-lima-600"
                       />
@@ -440,8 +491,8 @@ const Products = () => {
                       <input
                         type="radio"
                         name="mobile-sort"
-                        value="rating"
-                        checked={sortBy === 'rating'}
+                        value="high_rating"
+                        checked={sortBy === 'high_rating'}
                         onChange={(e) => setSortBy(e.target.value)}
                         className="w-4 h-4 text-lima-600 focus:ring-lima-600"
                       />
@@ -451,8 +502,8 @@ const Products = () => {
                       <input
                         type="radio"
                         name="mobile-sort"
-                        value="name"
-                        checked={sortBy === 'name'}
+                        value="name_a_to_z"
+                        checked={sortBy === 'name_a_to_z'}
                         onChange={(e) => setSortBy(e.target.value)}
                         className="w-4 h-4 text-lima-600 focus:ring-lima-600"
                       />
@@ -469,8 +520,8 @@ const Products = () => {
                       <input
                         type="radio"
                         name="mobile-price"
-                        value="all"
-                        checked={priceRange === 'all'}
+                        value=""
+                        checked={priceRange === ''}
                         onChange={(e) => setPriceRange(e.target.value)}
                         className="w-4 h-4 text-lima-600 focus:ring-lima-600"
                       />
@@ -527,9 +578,9 @@ const Products = () => {
                 <div className="space-y-3">
                   <button
                     onClick={() => {
-                      setSelectedCategory('All');
+                      setSelectedCategory('');
                       setSortBy('featured');
-                      setPriceRange('all');
+                      setPriceRange('');
                     }}
                     className="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
                   >
@@ -539,7 +590,7 @@ const Products = () => {
                     onClick={() => setMobileFiltersOpen(false)}
                     className="w-full px-4 py-3 bg-lima-600 text-white rounded-lg font-semibold text-sm hover:bg-lima-700 transition-colors"
                   >
-                    Show {sortedProducts.length} Products
+                    Show {filteredProducts.length} Products
                   </button>
                 </div>
               </div>
@@ -548,21 +599,21 @@ const Products = () => {
 
           {/* Products Grid */}
           <div className="lg:col-span-3">
-            {sortedProducts.length > 0 ? (
+            {filteredProducts.length > 0 ? (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.5 }}
                 className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"
               >
-                {sortedProducts.map((product, index) => (
+                {filteredProducts.map((product, index) => (
                   <motion.div
                     key={product.id}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4, delay: index * 0.05 }}
                   >
-                    <ProductCard product={product} />
+                    <ProductCard product={product} onAddToWishlist={handleAddToWishlist} />
                   </motion.div>
                 ))}
               </motion.div>
@@ -579,9 +630,9 @@ const Products = () => {
                 </p>
                 <button
                   onClick={() => {
-                    setSelectedCategory('All');
+                    setSelectedCategory('');
                     setSortBy('featured');
-                    setPriceRange('all');
+                    setPriceRange('');
                   }}
                   className="px-6 py-2 bg-lima-600 text-white rounded-lg font-semibold hover:bg-lima-700 transition-colors"
                 >

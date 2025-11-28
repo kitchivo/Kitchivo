@@ -39,12 +39,12 @@ const AuthProvider = ({ children }) => {
         return;
       } else {
         toast.error(res?.message)
-        setError(t("Invalid Credentials"));
+        setError("Invalid Credentials");
         return;
       }
     } catch (err) {
       console.log("ERROR", err);
-      setError(t("Invalid Credentials"));
+      setError("Invalid Credentials");
     }
   };
 
@@ -54,9 +54,9 @@ const AuthProvider = ({ children }) => {
     localStorage.removeItem("token");
     // localStorage.removeItem("email");
     localStorage.removeItem("username");
-    localStorage.removeItem("role");
+    // localStorage.removeItem("role");
     toast.success("You are Successfully Logged-Out");
-    navigate("/signin");
+    navigate("/");
     window.location.reload();
   };
 

@@ -41,7 +41,7 @@ function App() {
       <Route path="/wishlist" element={<Wishlist />} />
       <Route path="/about" element={<About />} />
       <Route path="/contact" element={<Contact />} />
-      <Route path="/category/:categoryName" element={<CategoryProducts />} />
+      <Route path="/category/:category_id" element={<CategoryProducts />} />
       <Route path="/product/:id" element={<ProductDetail />} />
       <Route path="/privacy-policy" element={<PrivacyPolicy />} />
       <Route path="/terms-of-service" element={<TermsOfService />} />

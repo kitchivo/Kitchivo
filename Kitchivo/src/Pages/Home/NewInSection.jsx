@@ -101,7 +101,7 @@
 import React, { useRef } from "react";
 import ProductCard from "../../components/ProductCard";
 
-const NewInSection = ({ products = [] }) => {
+const NewInSection = ({ products = [], onAddToWishlist }) => {
   const scrollContainerRef = useRef(null);
 
   const scroll = (direction) => {
@@ -174,7 +174,10 @@ const NewInSection = ({ products = [] }) => {
                 className="flex-none w-[280px] sm:w-[calc(50%-12px)] md:w-[calc(33.333%-16px)] 
                 lg:w-[calc(26%-18px)] snap-start"
               >
-                <ProductCard product={product} />
+                <ProductCard
+                  product={product}
+                  onAddToWishlist={onAddToWishlist}
+                />
               </div>
             ))}
           </div>

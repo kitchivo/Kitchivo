@@ -1,71 +1,112 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
-import ProductCard from '../../components/ProductCard';
 import Breadcrumb from '../../components/Breadcrumb';
 import deleteIcon from "../../assets/delete.svg";
+import { createWishlist, getWishlist, removeWishlist } from '../../redux/slices/CommanSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
+import { getProfile } from '../../redux/slices/AuthSlice';
 
 const Wishlist = () => {
-  // Mock wishlist data - in real app, this would come from state management/API
-  const [wishlistItems, setWishlistItems] = useState([
-    {
-      id: 1,
-      name: 'Premium Non-Stick Frying Pan',
-      price: '₹4,199',
-      originalPrice: '₹6,799',
-      discount: '-38%',
-      image: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=500',
-    },
-    {
-      id: 2,
-      name: 'Stainless Steel Cookware Set',
-      price: '₹10,999',
-      originalPrice: '₹16,999',
-      discount: '-35%',
-      image: 'https://images.unsplash.com/photo-1585659722983-3a675dabf23d?w=500',
-    },
-    {
-      id: 3,
-      name: 'Ceramic Dinner Plate Set',
-      price: '₹3,299',
-      originalPrice: '₹4,999',
-      discount: '-33%',
-      image: 'https://images.unsplash.com/photo-1578500494198-246f612d3b3d?w=500',
-    },
-    {
-      id: 4,
-      name: 'Kitchen Knife Set - Professional',
-      price: '₹7,499',
-      originalPrice: '₹12,499',
-      discount: '-40%',
-      image: 'https://images.unsplash.com/photo-1593618998160-e34014e67546?w=500',
-    },
-    {
-      id: 5,
-      name: 'Glass Storage Container Set',
-      price: '₹2,899',
-      originalPrice: '₹4,199',
-      discount: '-30%',
-      image: 'https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=500',
-    },
-    {
-      id: 6,
-      name: 'Bamboo Cutting Board',
-      price: '₹2,099',
-      originalPrice: '₹3,299',
-      discount: '-38%',
-      image: 'https://images.unsplash.com/photo-1565123409695-7b5ef63a2efb?w=500',
-    },
-  ]);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  const removeFromWishlist = (id) => {
-    setWishlistItems(wishlistItems.filter(item => item.id !== id));
+  const { wishlist, loading } = useSelector((state) => state.commanStore);
+  const items = wishlist?.items || [];
+  const totalItems = wishlist?.total_items ?? items.length;
+
+  useEffect(() => {
+    dispatch(getWishlist());
+  }, [dispatch]);
+
+  // const handleRemoveFromWishlist = async (wishlistItemId) => {
+  //   try {
+  //     const resultAction = await dispatch(
+  //       removeWishlist({ wishlist_item_id: wishlistItemId })
+  //     );
+  //     if (resultAction?.payload?.status === 1) {
+  //       toast.success(resultAction?.payload?.message || 'Removed from wishlist');
+  //       dispatch(getWishlist());
+  //     } else {
+  //       toast.error(resultAction?.payload?.message || 'Failed to remove from wishlist');
+  //     }
+  //   } catch (error) {
+  //     toast.error('Failed to remove from wishlist');
+  //   }
+  // };
+
+  const handleAddToWishlist = async (product) => {
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+      Swal.fire({
+        title: 'Login required',
+        text: 'Please login first to add products to your wishlist.',
+        icon: 'warning',
+        confirmButtonText: 'Login',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          navigate('/login');
+        }
+      });
+      return;
+    }
+
+    // if (product?.is_wishlisted) {
+    //   return;
+    // }
+
+    const productId = product?.id;
+    if (!productId) {
+      return;
+    }
+
+    try {
+      const resultAction = await dispatch(createWishlist({ product_id: productId }));
+      console.log("resultAction", resultAction)
+      if (resultAction?.payload?.status == 1) {
+        toast.success(resultAction?.payload?.message || 'Added to wishlist');
+        dispatch(getWishlist());
+        dispatch(getProfile());
+      } else {
+        toast.error(resultAction?.payload?.message || 'Failed to add to wishlist');
+      }
+    } catch (error) {
+      toast.error('Failed to add to wishlist');
+    }
   };
 
-  const clearWishlist = () => {
-    if (window.confirm('Are you sure you want to clear your entire wishlist?')) {
-      setWishlistItems([]);
+  const handleAddToCart = (product) => {
+    // Placeholder for future cart integration
+    toast.info('Add to Cart functionality will be implemented soon.');
+  };
+
+  const getVariantPrimaryImage = (product) => {
+    if (!product?.variants || product.variants.length === 0) return null;
+    for (const variant of product.variants) {
+      if (variant.images && variant.images.length > 0) {
+        const primary = variant.images.find((img) => img.is_primary) || variant.images[0];
+        if (primary?.url) return primary.url;
+      }
+    }
+    return null;
+  };
+
+  const getPrimaryImage = (product) => {
+    const variantImg = getVariantPrimaryImage(product);
+    if (variantImg) return variantImg;
+    if (product?.featured_image) return product.featured_image;
+    if (product?.common_images && product.common_images.length > 0) {
+      return product.common_images[0].url;
+    }
+    return null;
+  };
+
+  const handleBuyOnAmazon = (url) => {
+    if (url) {
+      window.open(url, '_blank', 'noopener,noreferrer');
     }
   };
 
@@ -73,7 +114,7 @@ const Wishlist = () => {
     <div className="min-h-screen bg-gray-50 font-sans">
       <Navbar />
 
-      <Breadcrumb 
+      <Breadcrumb
         items={[
           { label: 'Home', href: '/' },
           { label: 'Wishlist' }
@@ -89,18 +130,11 @@ const Wishlist = () => {
               My Wishlist
             </h1>
             <p className="text-sm sm:text-base text-gray-600">
-              {wishlistItems.length} {wishlistItems.length === 1 ? 'item' : 'items'} saved for later
+              {totalItems} {totalItems === 1 ? 'item' : 'items'} saved for later
             </p>
           </div>
-          
-          {wishlistItems.length > 0 && (
+          {items.length > 0 && (
             <div className="flex gap-3">
-              <button
-                onClick={clearWishlist}
-                className="px-4 py-2 border-2 border-red-500 text-red-500 rounded-lg font-semibold text-sm hover:bg-red-500 hover:text-white transition-all duration-300"
-              >
-                Clear All
-              </button>
               <Link
                 to="/"
                 className="px-4 py-2 bg-lima-600 text-white rounded-lg font-semibold text-sm hover:bg-lima-700 transition-all duration-300"
@@ -112,23 +146,142 @@ const Wishlist = () => {
         </div>
 
         {/* Wishlist Items */}
-        {wishlistItems.length > 0 ? (
+        {loading && !wishlist && (
+          <div className="flex items-center justify-center py-10 text-gray-500 text-sm">
+            Loading wishlist...
+          </div>
+        )}
+
+        {items.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-            {wishlistItems.map((item) => (
-              <div key={item.id} className="relative group/card">
-                {/* Remove Button - Positioned at top right */}
-                <button
-                  onClick={() => removeFromWishlist(item.id)}
-                  className="absolute top-2 right-2 z-20 w-8 h-8 sm:w-9 sm:h-9 bg-error-100 text-white rounded-full flex items-center justify-center cursor-pointer transition-all"
-                  aria-label="Remove from wishlist"
-                >
-                  <img src={deleteIcon} alt="Remove from wishlist" />
-                </button>
-                
-                {/* Product Card */}
-                <ProductCard product={item} hideWishlistButton={true} />
-              </div>
-            ))}
+            {items.map(({ wishlist_item_id, product }) => {
+              const primaryImage = getPrimaryImage(product);
+              const thumbnails = product?.common_images || [];
+
+              return (
+                <div key={wishlist_item_id} className="relative group/card bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden flex flex-col">
+                  {/* Remove Button */}
+                  <button
+                    onClick={() => handleAddToWishlist(product)}
+                    className="absolute top-2 right-2 z-20 w-8 h-8 sm:w-9 sm:h-9 bg-error-100 text-white rounded-full flex items-center justify-center cursor-pointer transition-all"
+                    aria-label="Remove from wishlist"
+                  >
+                    <img src={deleteIcon} alt="Remove from wishlist" />
+                  </button>
+
+                  {/* Image */}
+                  <div className="w-full aspect-[4/3] bg-gray-50 flex items-center justify-center overflow-hidden">
+                    {primaryImage ? (
+                      <img
+                        src={primaryImage}
+                        alt={product.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    ) : (
+                      <div className="text-gray-400 text-sm">No image</div>
+                    )}
+                  </div>
+
+                  {/* Content */}
+                  <div className="p-4 flex-1 flex flex-col">
+                    <h3 className="text-sm sm:text-base font-semibold text-gray-900 mb-1 line-clamp-2">
+                      {product.name}
+                    </h3>
+                    {product.category?.name && (
+                      <p className="text-xs text-gray-500 mb-2">{product.category.name}</p>
+                    )}
+
+                    {/* Price */}
+                    <div className="mb-2">
+                      <div className="flex items-center gap-2">
+                        <p className="text-base font-semibold text-san-felix-800">
+                          ₹ {product.sale_price}
+                        </p>
+                        {product.mrp && (
+                          <p className="text-xs text-gray-400 line-through">
+                            ₹ {product.mrp}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Sizes */}
+                    {product.available_sizes?.length > 0 && (
+                      <div className="mb-2">
+                        <p className="text-xs font-semibold text-gray-700 mb-1">Available Sizes</p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {product.available_sizes.map((size) => (
+                            <span
+                              key={size.id}
+                              className="px-2 py-0.5 border border-gray-300 rounded text-[11px] text-gray-700"
+                            >
+                              {size.name}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Colors */}
+                    {product.available_colors?.length > 0 && (
+                      <div className="mb-2">
+                        <p className="text-xs font-semibold text-gray-700 mb-1">Available Colors</p>
+                        <div className="flex flex-wrap gap-2">
+                          {product.available_colors.map((color) => (
+                            <div key={color.id} className="flex items-center gap-1">
+                              <span
+                                className="w-4 h-4 rounded-full border border-gray-300"
+                                style={{ backgroundColor: color.hex_code || '#e5e7eb' }}
+                              />
+                              <span className="text-[11px] text-gray-600">
+                                {color.name}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Thumbnails */}
+                    {thumbnails.length > 0 && (
+                      <div className="mt-2 mb-3">
+                        <div className="flex gap-2 overflow-x-auto pb-1">
+                          {thumbnails.map((img) => (
+                            <div
+                              key={img.id}
+                              className="w-10 h-10 rounded border border-gray-200 overflow-hidden flex-shrink-0"
+                            >
+                              <img
+                                src={img.url}
+                                alt={product.name}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Actions */}
+                    <div className="mt-auto flex flex-col gap-2 pt-2">
+                      <button
+                        onClick={() => handleBuyOnAmazon(product?.url)}
+                        className="w-full inline-flex items-center justify-center px-3 py-2 rounded-lg bg-lima-600 text-white text-xs sm:text-sm font-semibold hover:bg-lima-700 transition-colors"
+                      >
+                        {/* Add to Cart */}
+                        Buy on Amazon
+                      </button>
+                      <button
+                        onClick={() => navigate(`/product/${product.id}`)}
+                        className="w-full inline-flex items-center justify-center px-3 py-2 rounded-lg border border-gray-300 text-xs sm:text-sm font-semibold text-gray-700 hover:border-lima-600 hover:text-lima-700 transition-colors"
+                      >
+                        View Product
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         ) : (
           // Empty State

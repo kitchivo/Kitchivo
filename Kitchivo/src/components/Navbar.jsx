@@ -2,13 +2,15 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import Logo from "../assets/Logo_Full.png";
-import { allProducts } from '../data/productsData';
 import { useSelector } from "react-redux";
+import { useAuth } from "../context/AuthContext";
 
 const Navbar = () => {
 
   const token = localStorage.getItem("token");
   const { user } = useSelector((state) => state.authStore);
+  const { dashboard } = useSelector((state) => state.commanStore);
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [shopDropdown, setShopDropdown] = useState(false);
   const [pagesDropdown, setPagesDropdown] = useState(false);
@@ -18,6 +20,17 @@ const Navbar = () => {
   const [searchOpen, setSearchOpen] = useState(false);
   const [showNavbar, setShowNavbar] = useState(true);
   const lastScrollY = useRef(0);
+
+  const { logOut, user: authUser } = useAuth();
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+
+  const displayName = (user && user.name) || (authUser && authUser.name) || "";
+
+  const handleUserMenuBlur = (e) => {
+    if (!e.currentTarget.contains(e.relatedTarget)) {
+      setUserMenuOpen(false);
+    }
+  };
 
   // Smooth scroll function
   const scrollToSection = (id) => {
@@ -68,12 +81,13 @@ const Navbar = () => {
   };
 
   // Get unique categories from allProducts
-  const categories = Array.from(new Set(allProducts.map(p => p.category)));
+  const categories = dashboard?.categories?.filter((cat) => cat.status) || [];
 
   return (
     <nav
       className={`sticky top-0 z-50 bg-white shadow-sm transform transition-transform duration-300 ${isNavVisible ? "translate-y-0" : "-translate-y-full"
         }`}
+        onMouseLeave={() => setUserMenuOpen(false)}
     >
       {/* Top Bar - Hidden on mobile, visible on sm and up */}
       <div className="hidden md:block bg-gray-100 border-b border-gray-200">
@@ -246,20 +260,26 @@ const Navbar = () => {
                   <div className="bg-white rounded-xl shadow-2xl border border-gray-200 mx-6 lg:mx-8">
                     <div className="p-6 lg:p-8">
                       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 lg:gap-6">
-                        {categories.map((cat) => (
-                          <Link
-                            key={cat}
-                            to={`/category/${cat.replace(/\s+/g, '-').toLowerCase()}`}
-                            className="group/item"
-                            onClick={() => setCollectionsDropdownOpen(false)}
-                          >
-                            <div className="p-3 lg:p-4 rounded-lg hover:bg-lima-50 transition-all duration-300 text-center">
-                              <h3 className="font-bold text-gray-900 mb-1 group-hover/item:text-lima-700">
-                                {cat}
-                              </h3>
-                            </div>
-                          </Link>
-                        ))}
+                        {categories.length > 0 ? (
+                          categories.map((category) => (
+                            <Link
+                              key={category.id}
+                              to={`/category/${category.id}`}
+                              className="group/item"
+                              onClick={() => setCollectionsDropdownOpen(false)}
+                            >
+                              <div className="p-3 lg:p-4 rounded-lg hover:bg-lima-50 transition-all duration-300 text-center">
+                                <h3 className="font-bold text-gray-900 mb-1 group-hover/item:text-lima-700">
+                                  {category.name}
+                                </h3>
+                              </div>
+                            </Link>
+                          ))
+                        ) : (
+                          <div className="col-span-full text-center text-sm text-gray-500 py-4">
+                            No categories available.
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -268,30 +288,59 @@ const Navbar = () => {
             </div>
 
             {/* Right Icons */}
-            {token ?
+            {token ? (
               <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
-                {/* <Link
-                  to="/login"
-                  className="flex items-center gap-2 text-gray-800 hover:text-lima-600 transition-colors"
-                > */}
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+                {/* User menu with hover/focus dropdown */}
+                <div
+                  className="relative"
+                  onMouseEnter={() => setUserMenuOpen(true)}
+                  // onMouseLeave={() => setUserMenuOpen(false)}
+                >
+                  <button
+                    type="button"
+                    className="flex items-center gap-2 text-gray-800 hover:text-lima-600 transition-colors"
+                    aria-haspopup="true"
+                    aria-expanded={userMenuOpen}
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                    />
-                  </svg>
-                  <span className="hidden lg:inline text-sm">
-                    {user && user?.name ? `Hi, ${user?.name}` : "Sign in / Register"}
-                  </span>
-                  <span className="lg:hidden text-xs">Sign in</span>
-                {/* </Link> */}
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                      />
+                    </svg>
+                    <span className="hidden lg:inline text-sm">
+                      {displayName ? `Hi, ${displayName}` : "Account"}
+                    </span>
+                    <span className="lg:hidden text-xs">
+                      {displayName ? "Account" : "Sign in"}
+                    </span>
+                  </button>
+
+                  {userMenuOpen && (
+                    <div
+                      className="absolute right-0 mt-2 w-32 bg-white border border-gray-200 rounded-md shadow-lg py-1 text-sm"
+                      role="menu"
+                      onMouseEnter={() => setUserMenuOpen(true)}
+                      onMouseLeave={() => setUserMenuOpen(false)}
+                    >
+                      <button
+                        type="button"
+                        onClick={logOut}
+                        className="block w-full text-left px-3 py-2 text-gray-700 hover:bg-gray-100"
+                        role="menuitem"
+                      >
+                        Logout
+                      </button>
+                    </div>
+                  )}
+                </div>
 
                 <Link to="/wishlist" className="relative text-gray-800 hover:text-lima-600 active:text-lima-700 transition-colors">
                   <svg
@@ -308,7 +357,7 @@ const Navbar = () => {
                     />
                   </svg>
                   <span className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 bg-lima-600 text-white text-xs rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center">
-                    {user && user?.wishlist ? user?.wishlist.length : 0}
+                    {user && user?.wishlist_items ? user?.wishlist_items : 0}
                   </span>
                 </Link>
 
@@ -353,7 +402,7 @@ const Navbar = () => {
                   </svg>
                 </button>
               </div>
-              :
+            ) :
               <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
                 <Link
                   to="/login"
@@ -502,66 +551,25 @@ const Navbar = () => {
                 }`}
             >
               <div className="pl-6 pr-3 py-2 space-y-1">
-                <a
-                  href="#cookware"
-                  className="block px-3 py-2 text-sm text-gray-700 hover:text-lima-600 hover:bg-lima-50 rounded-md"
-                >
-                  Cookware
-                </a>
-                <a
-                  href="#kitchen-tools"
-                  className="block px-3 py-2 text-sm text-gray-700 hover:text-lima-600 hover:bg-lima-50 rounded-md"
-                >
-                  Kitchen Tools
-                </a>
-                <a
-                  href="#storage"
-                  className="block px-3 py-2 text-sm text-gray-700 hover:text-lima-600 hover:bg-lima-50 rounded-md"
-                >
-                  Storage Solutions
-                </a>
-                <a
-                  href="#dining"
-                  className="block px-3 py-2 text-sm text-gray-700 hover:text-lima-600 hover:bg-lima-50 rounded-md"
-                >
-                  Dining & Serveware
-                </a>
-                <a
-                  href="#home-decor"
-                  className="block px-3 py-2 text-sm text-gray-700 hover:text-lima-600 hover:bg-lima-50 rounded-md"
-                >
-                  Home Decor
-                </a>
-                <a
-                  href="#appliances"
-                  className="block px-3 py-2 text-sm text-gray-700 hover:text-lima-600 hover:bg-lima-50 rounded-md"
-                >
-                  Appliances
-                </a>
-                <a
-                  href="#bakeware"
-                  className="block px-3 py-2 text-sm text-gray-700 hover:text-lima-600 hover:bg-lima-50 rounded-md"
-                >
-                  Bakeware
-                </a>
-                <a
-                  href="#cutlery"
-                  className="block px-3 py-2 text-sm text-gray-700 hover:text-lima-600 hover:bg-lima-50 rounded-md"
-                >
-                  Cutlery & Knives
-                </a>
-                <a
-                  href="#textiles"
-                  className="block px-3 py-2 text-sm text-gray-700 hover:text-lima-600 hover:bg-lima-50 rounded-md"
-                >
-                  Kitchen Textiles
-                </a>
-                <a
-                  href="#accessories"
-                  className="block px-3 py-2 text-sm text-gray-700 hover:text-lima-600 hover:bg-lima-50 rounded-md"
-                >
-                  Accessories
-                </a>
+                {categories.length > 0 ? (
+                  categories.map((category) => (
+                    <Link
+                      key={category.id}
+                      to={`/category/${category.id}`}
+                      className="block px-3 py-2 text-sm text-gray-700 hover:text-lima-600 hover:bg-lima-50 rounded-md"
+                      onClick={() => {
+                        setCollectionsDropdown(false);
+                        setMobileMenuOpen(false);
+                      }}
+                    >
+                      {category.name}
+                    </Link>
+                  ))
+                ) : (
+                  <div className="px-3 py-2 text-sm text-gray-500">
+                    No categories available.
+                  </div>
+                )}
               </div>
             </div>
           </div>

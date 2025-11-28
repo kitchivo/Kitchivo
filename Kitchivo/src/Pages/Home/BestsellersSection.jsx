@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import ProductCard from '../../components/ProductCard';
 import { getBestsellers } from '../../data/productsData';
 
-const BestsellersSection = ({ products = [] }) => {
+const BestsellersSection = ({ products = [], onAddToWishlist }) => {
   const scrollContainerRef = useRef(null);
 
   const scroll = (direction) => {
@@ -71,7 +71,10 @@ const BestsellersSection = ({ products = [] }) => {
                 className="flex-none w-[280px] sm:w-[calc(50%-12px)] md:w-[calc(33.333%-16px)] 
                 lg:w-[calc(26%-18px)] snap-start"
               >
-                <ProductCard product={product} />
+                <ProductCard
+                  product={product}
+                  onAddToWishlist={onAddToWishlist}
+                />
               </div>
             ))}
           </div>

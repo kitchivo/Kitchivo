@@ -1,66 +1,96 @@
-import React, { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import Breadcrumb from '../../components/Breadcrumb';
 import ProductCard from '../../components/ProductCard';
-import { getProductsByCategories } from '../../data/productsData';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchAllProductsByCategory, createWishlist } from '../../redux/slices/CommanSlice';
+import { toast } from 'react-toastify';
+import Swal from 'sweetalert2';
+import { getProfile } from '../../redux/slices/AuthSlice';
 
 const CategoryProducts = () => {
-  const { categoryName } = useParams();
-  const [sortBy, setSortBy] = useState('featured');
-  const [priceRange, setPriceRange] = useState('all');
+  const { category_id } = useParams();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { categoryProducts, loading } = useSelector((state) => state.commanStore);
+  const [page, setPage] = useState(1);
+  const [sortBy, setSortBy] = useState('');
+  const [priceRange, setPriceRange] = useState('');
+  const [search, setSearch] = useState('');
   const [sortDropdownOpen, setSortDropdownOpen] = useState(false);
 
-  // Get products grouped by category from central data file
-  const allProducts = getProductsByCategories();
+  const currentFilters = {
+    category_id,
+    page,
+    priceRange,
+    sortBy,
+    search,
+  };
 
-  // Get category key from URL parameter
-  const categoryKey = categoryName?.toLowerCase().replace(/\s+/g, '-');
-  const products = allProducts[categoryKey] || [];
+  useEffect(() => {
+    setPage(1);
+    setSortBy('');
+    setPriceRange('');
+    setSearch('');
+  }, [category_id]);
 
-  // Format category name for display
-  const displayCategoryName = categoryName?.split('-').map(word => 
-    word.charAt(0).toUpperCase() + word.slice(1)
-  ).join(' ');
+  useEffect(() => {
+    if (!category_id) return;
+    dispatch(fetchAllProductsByCategory(currentFilters));
+  }, [dispatch, category_id, page, priceRange, sortBy, search]);
 
-  // Sorting logic
-  const getSortedProducts = () => {
-    let filtered = [...products];
+  const handleAddToWishlist = async (product) => {
+    const token = localStorage.getItem('token');
 
-    // Filter by price range
-    if (priceRange === 'under-1000') {
-      filtered = filtered.filter(p => p.price < 1000);
-    } else if (priceRange === '1000-5000') {
-      filtered = filtered.filter(p => p.price >= 1000 && p.price < 5000);
-    } else if (priceRange === '5000-10000') {
-      filtered = filtered.filter(p => p.price >= 5000 && p.price < 10000);
-    } else if (priceRange === 'above-10000') {
-      filtered = filtered.filter(p => p.price >= 10000);
+    if (!token) {
+      Swal.fire({
+        title: 'Login required',
+        text: 'Please login first to add products to your wishlist.',
+        icon: 'warning',
+        confirmButtonText: 'Login',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          navigate('/login');
+        }
+      });
+      return;
     }
 
-    // Sort products
-    switch (sortBy) {
-      case 'price-low':
-        return filtered.sort((a, b) => a.price - b.price);
-      case 'price-high':
-        return filtered.sort((a, b) => b.price - a.price);
-      case 'rating':
-        return filtered.sort((a, b) => b.rating - a.rating);
-      case 'newest':
-        return filtered.filter(p => p.badge === 'New').concat(filtered.filter(p => p.badge !== 'New'));
-      default:
-        return filtered;
+    // if (product?.is_wishlisted) {
+    //   return;
+    // }
+
+    const productId = product?.id;
+    if (!productId) {
+      return;
+    }
+
+    try {
+      const resultAction = await dispatch(createWishlist({ product_id: productId }));
+      if (resultAction?.payload?.status == 1) {
+        toast.success(resultAction?.payload?.message || 'Added to wishlist');
+        dispatch(fetchAllProductsByCategory(currentFilters));
+        dispatch(getProfile());
+      } else {
+        toast.error(resultAction?.payload?.message || 'Failed to add to wishlist');
+      }
+    } catch (error) {
+      toast.error('Failed to add to wishlist');
     }
   };
 
-  const sortedProducts = getSortedProducts();
+  const categoryInfo = categoryProducts?.category;
+  const products = categoryProducts?.products || [];
+  const pagination = categoryProducts?.pagination;
+  const displayCategoryName = categoryInfo?.name || 'Category';
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans">
       <Navbar />
 
-      <Breadcrumb 
+      <Breadcrumb
         items={[
           { label: 'Home', href: '/' },
           { label: 'Categories', href: '/#categories' },
@@ -76,7 +106,7 @@ const CategoryProducts = () => {
             {displayCategoryName}
           </h1>
           <p className="text-sm sm:text-base text-gray-600">
-            {sortedProducts.length} {sortedProducts.length === 1 ? 'product' : 'products'} found
+            {products.length} {products.length === 1 ? 'product' : 'products'} found
           </p>
         </div>
 
@@ -95,16 +125,15 @@ const CategoryProducts = () => {
                     className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-left text-sm text-gray-700 hover:border-lima-600 focus:outline-none focus:ring-2 focus:ring-lima-600 focus:border-transparent transition-all duration-200 flex items-center justify-between"
                   >
                     <span className="font-medium">
-                      {sortBy === 'featured' && 'Featured'}
-                      {sortBy === 'newest' && 'Newest First'}
-                      {sortBy === 'price-low' && 'Price: Low to High'}
-                      {sortBy === 'price-high' && 'Price: High to Low'}
-                      {sortBy === 'rating' && 'Highest Rated'}
+                      {sortBy === '' && 'Featured'}
+                      {sortBy === 'latest' && 'Latest'}
+                      {sortBy === 'price_low_to_high' && 'Price: Low to High'}
+                      {sortBy === 'price_high_to_low' && 'Price: High to Low'}
                     </span>
-                    <svg 
+                    <svg
                       className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${sortDropdownOpen ? 'rotate-180' : ''}`}
-                      fill="none" 
-                      stroke="currentColor" 
+                      fill="none"
+                      stroke="currentColor"
                       viewBox="0 0 24 24"
                     >
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
@@ -115,25 +144,24 @@ const CategoryProducts = () => {
                   {sortDropdownOpen && (
                     <>
                       {/* Backdrop */}
-                      <div 
-                        className="fixed inset-0 z-10" 
+                      <div
+                        className="fixed inset-0 z-10"
                         onClick={() => setSortDropdownOpen(false)}
                       />
-                      
+
                       {/* Dropdown List */}
                       <div className="absolute z-20 w-full mt-2 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden">
                         <button
                           onClick={() => {
-                            setSortBy('featured');
+                            setSortBy('');
                             setSortDropdownOpen(false);
                           }}
-                          className={`w-full px-4 py-2.5 text-left text-sm hover:bg-lima-50 transition-colors ${
-                            sortBy === 'featured' ? 'bg-lima-50 text-lima-700 font-semibold' : 'text-gray-700'
-                          }`}
+                          className={`w-full px-4 py-2.5 text-left text-sm hover:bg-lima-50 transition-colors ${sortBy === '' ? 'bg-lima-50 text-lima-700 font-semibold' : 'text-gray-700'
+                            }`}
                         >
                           <div className="flex items-center justify-between">
                             <span>Featured</span>
-                            {sortBy === 'featured' && (
+                            {sortBy === '' && (
                               <svg className="w-4 h-4 text-lima-600" fill="currentColor" viewBox="0 0 20 20">
                                 <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                               </svg>
@@ -142,16 +170,15 @@ const CategoryProducts = () => {
                         </button>
                         <button
                           onClick={() => {
-                            setSortBy('newest');
+                            setSortBy('latest');
                             setSortDropdownOpen(false);
                           }}
-                          className={`w-full px-4 py-2.5 text-left text-sm hover:bg-lima-50 transition-colors ${
-                            sortBy === 'newest' ? 'bg-lima-50 text-lima-700 font-semibold' : 'text-gray-700'
-                          }`}
+                          className={`w-full px-4 py-2.5 text-left text-sm hover:bg-lima-50 transition-colors ${sortBy === 'latest' ? 'bg-lima-50 text-lima-700 font-semibold' : 'text-gray-700'
+                            }`}
                         >
                           <div className="flex items-center justify-between">
-                            <span>Newest First</span>
-                            {sortBy === 'newest' && (
+                            <span>Latest</span>
+                            {sortBy === 'latest' && (
                               <svg className="w-4 h-4 text-lima-600" fill="currentColor" viewBox="0 0 20 20">
                                 <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                               </svg>
@@ -160,16 +187,15 @@ const CategoryProducts = () => {
                         </button>
                         <button
                           onClick={() => {
-                            setSortBy('price-low');
+                            setSortBy('price_low_to_high');
                             setSortDropdownOpen(false);
                           }}
-                          className={`w-full px-4 py-2.5 text-left text-sm hover:bg-lima-50 transition-colors ${
-                            sortBy === 'price-low' ? 'bg-lima-50 text-lima-700 font-semibold' : 'text-gray-700'
-                          }`}
+                          className={`w-full px-4 py-2.5 text-left text-sm hover:bg-lima-50 transition-colors ${sortBy === 'price_low_to_high' ? 'bg-lima-50 text-lima-700 font-semibold' : 'text-gray-700'
+                            }`}
                         >
                           <div className="flex items-center justify-between">
                             <span>Price: Low to High</span>
-                            {sortBy === 'price-low' && (
+                            {sortBy === 'price_low_to_high' && (
                               <svg className="w-4 h-4 text-lima-600" fill="currentColor" viewBox="0 0 20 20">
                                 <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                               </svg>
@@ -178,34 +204,15 @@ const CategoryProducts = () => {
                         </button>
                         <button
                           onClick={() => {
-                            setSortBy('price-high');
+                            setSortBy('price_high_to_low');
                             setSortDropdownOpen(false);
                           }}
-                          className={`w-full px-4 py-2.5 text-left text-sm hover:bg-lima-50 transition-colors ${
-                            sortBy === 'price-high' ? 'bg-lima-50 text-lima-700 font-semibold' : 'text-gray-700'
-                          }`}
+                          className={`w-full px-4 py-2.5 text-left text-sm hover:bg-lima-50 transition-colors ${sortBy === 'price_high_to_low' ? 'bg-lima-50 text-lima-700 font-semibold' : 'text-gray-700'
+                            }`}
                         >
                           <div className="flex items-center justify-between">
                             <span>Price: High to Low</span>
-                            {sortBy === 'price-high' && (
-                              <svg className="w-4 h-4 text-lima-600" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                              </svg>
-                            )}
-                          </div>
-                        </button>
-                        <button
-                          onClick={() => {
-                            setSortBy('rating');
-                            setSortDropdownOpen(false);
-                          }}
-                          className={`w-full px-4 py-2.5 text-left text-sm hover:bg-lima-50 transition-colors ${
-                            sortBy === 'rating' ? 'bg-lima-50 text-lima-700 font-semibold' : 'text-gray-700'
-                          }`}
-                        >
-                          <div className="flex items-center justify-between">
-                            <span>Highest Rated</span>
-                            {sortBy === 'rating' && (
+                            {sortBy === 'price_high_to_low' && (
                               <svg className="w-4 h-4 text-lima-600" fill="currentColor" viewBox="0 0 20 20">
                                 <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                               </svg>
@@ -226,8 +233,8 @@ const CategoryProducts = () => {
                     <input
                       type="radio"
                       name="price"
-                      value="all"
-                      checked={priceRange === 'all'}
+                      value=""
+                      checked={priceRange === ''}
                       onChange={(e) => setPriceRange(e.target.value)}
                       className="w-4 h-4 text-lima-600 focus:ring-lima-600"
                     />
@@ -283,8 +290,9 @@ const CategoryProducts = () => {
               {/* Reset Filters */}
               <button
                 onClick={() => {
-                  setSortBy('featured');
-                  setPriceRange('all');
+                  setSortBy('');
+                  setPriceRange('');
+                  setPage(1);
                 }}
                 className="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
               >
@@ -295,12 +303,47 @@ const CategoryProducts = () => {
 
           {/* Products Grid */}
           <div className="lg:col-span-3">
-            {sortedProducts.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                {sortedProducts.map((product) => (
-                  <ProductCard key={product.id} product={product} />
-                ))}
+            {loading ? (
+              <div className="flex items-center justify-center py-16 text-gray-500 text-sm">
+                Loading products...
               </div>
+            ) : products.length > 0 ? (
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                  {products.map((product) => (
+                    <ProductCard
+                      key={product.id}
+                      product={product}
+                      onAddToWishlist={handleAddToWishlist}
+                    />
+                  ))}
+                </div>
+                {pagination && pagination.total_pages > 1 && (
+                  <div className="flex items-center justify-center mt-8 gap-4">
+                    <button
+                      disabled={pagination.current_page <= 1}
+                      onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+                      className="px-4 py-2 rounded-lg border border-gray-300 text-sm font-medium text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                    >
+                      Previous
+                    </button>
+                    <span className="text-sm text-gray-600">
+                      Page {pagination.current_page} of {pagination.total_pages}
+                    </span>
+                    <button
+                      disabled={pagination.current_page >= pagination.total_pages}
+                      onClick={() =>
+                        setPage((prev) =>
+                          pagination.total_pages ? Math.min(pagination.total_pages, prev + 1) : prev + 1
+                        )
+                      }
+                      className="px-4 py-2 rounded-lg border border-gray-300 text-sm font-medium text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                    >
+                      Next
+                    </button>
+                  </div>
+                )}
+              </>
             ) : (
               <div className="flex flex-col items-center justify-center py-16">
                 <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
@@ -314,8 +357,9 @@ const CategoryProducts = () => {
                 </p>
                 <button
                   onClick={() => {
-                    setSortBy('featured');
-                    setPriceRange('all');
+                    setSortBy('');
+                    setPriceRange('');
+                    setPage(1);
                   }}
                   className="px-6 py-2 bg-lima-600 text-white rounded-lg font-semibold hover:bg-lima-700 transition-colors"
                 >

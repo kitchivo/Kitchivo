@@ -177,9 +177,7 @@ const CategoriesSection = ({ categories = [] }) => {
                 className="flex-none w-[110px] sm:w-[130px] md:w-[140px] snap-start"
               >
                 <Link
-                  to={`/category/${category.name
-                    ?.toLowerCase()
-                    .replace(/\s+/g, "-")}`}
+                  to={`/category/${category.id}`}
                   className="group cursor-pointer text-center block"
                 >
                   <div className="flex justify-center mb-2 sm:mb-3">
