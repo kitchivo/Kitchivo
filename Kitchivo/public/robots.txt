@@ -1,0 +1,22 @@
+# Kitchivo - Robots.txt
+# Allow all search engine crawlers
+
+User-agent: *
+Allow: /
+
+# Disallow private/user-specific pages
+Disallow: /profile
+Disallow: /profile-edit
+Disallow: /change-password
+Disallow: /wishlist
+Disallow: /login
+Disallow: /register
+Disallow: /verify-otp
+Disallow: /forgot-password
+
+# Sitemap location
+Sitemap: https://your-domain.com/sitemap.xml
+
+# Crawl-delay (optional, helps prevent server overload)
+Crawl-delay: 1
+

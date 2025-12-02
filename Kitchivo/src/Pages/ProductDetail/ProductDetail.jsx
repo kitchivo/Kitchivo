@@ -12,6 +12,7 @@ import {
 } from "../../redux/slices/CommanSlice";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
+import SEO from "../../components/SEO";
 
 // const formatReviewDate = (isoString) => {
 //   if (!isoString) return '';
@@ -629,8 +630,58 @@ const ProductDetail = () => {
         headerTotalReviews
       : 0);
 
+  // Product schema for SEO
+  const productSchema = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": product.name,
+    "image": product.featured_image || displayedImages[0]?.url,
+    "description": product.description || product.name,
+    "brand": {
+      "@type": "Brand",
+      "name": "Kitchivo"
+    },
+    "offers": {
+      "@type": "Offer",
+      "price": product.price || "0",
+      "priceCurrency": "INR",
+      "availability": product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"
+    },
+    "aggregateRating": headerTotalReviews > 0 ? {
+      "@type": "AggregateRating",
+      "ratingValue": headerAverageRating.toFixed(1),
+      "reviewCount": headerTotalReviews,
+      "bestRating": "5",
+      "worstRating": "1"
+    } : undefined,
+    "review": reviews?.slice(0, 5).map(review => ({
+      "@type": "Review",
+      "author": {
+        "@type": "Person",
+        "name": review.user?.name || "Anonymous"
+      },
+      "datePublished": review.created_at,
+      "reviewRating": {
+        "@type": "Rating",
+        "ratingValue": review.rating,
+        "bestRating": "5",
+        "worstRating": "1"
+      },
+      "reviewBody": review.comment
+    }))
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
+      <SEO
+        title={`${product.name} | Buy Online at Best Price - Kitchivo`}
+        description={`${product.description || product.name} - Shop now at Kitchivo. ${headerTotalReviews > 0 ? `Rated ${headerAverageRating.toFixed(1)}/5 by ${headerTotalReviews} customers.` : 'High quality kitchen and home products.'}`}
+        keywords={`${product.name}, ${product.category?.name || 'kitchen products'}, buy ${product.name}, ${product.category?.name} online, kitchenware, home products`}
+        canonicalUrl={`${window.location.origin}/product/${product.id}`}
+        ogImage={product.featured_image || displayedImages[0]?.url}
+        ogType="product"
+        schema={productSchema}
+      />
       <Navbar />
 
       <Breadcrumb

@@ -10,28 +10,31 @@ import './index.css';
 import store from './redux/store.js';
 import AuthProvider from './context/AuthContext.jsx';
 import { ToastContainer } from 'react-toastify';
+import { HelmetProvider } from 'react-helmet-async';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <BrowserRouter basename={"/"}>
-      <AuthProvider>
-        <Provider store={store}>
-          <ScrollToTop />
-          <App />
-        </Provider>
-      </AuthProvider>
-    </BrowserRouter>
-    <ToastContainer
-      position="top-right"
-      autoClose={3000}
-      hideProgressBar={false}
-      newestOnTop={false}
-      closeOnClick={false}
-      rtl={false}
-      pauseOnFocusLoss
-      draggable
-      pauseOnHover
-      theme="light"
-    />
+    <HelmetProvider>
+      <BrowserRouter basename={"/"}>
+        <AuthProvider>
+          <Provider store={store}>
+            <ScrollToTop />
+            <App />
+          </Provider>
+        </AuthProvider>
+      </BrowserRouter>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
+    </HelmetProvider>
   </React.StrictMode>
 );

@@ -9,6 +9,7 @@ import { createWishlist, getWishlist, removeWishlist } from '../../redux/slices/
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { getProfile } from '../../redux/slices/AuthSlice';
+import SEO from '../../components/SEO';
 
 const Wishlist = () => {
   const dispatch = useDispatch();
@@ -113,6 +114,13 @@ const Wishlist = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans">
+      <SEO
+        title="My Wishlist - Saved Products | Kitchivo"
+        description="View and manage your saved kitchen and home products. Keep track of your favorite items and shop them when you're ready."
+        keywords="wishlist, saved products, favorite items, kitchivo wishlist, my favorites"
+        canonicalUrl={`${window.location.origin}/wishlist`}
+        noindex={true}
+      />
       <Navbar />
 
       <Breadcrumb

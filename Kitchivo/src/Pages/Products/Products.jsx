@@ -10,6 +10,7 @@ import { fetchAllProducts, createWishlist } from '../../redux/slices/CommanSlice
 import { toast } from 'react-toastify';
 import Swal from 'sweetalert2';
 import { getProfile } from '../../redux/slices/AuthSlice';
+import SEO from '../../components/SEO';
 
 const Products = () => {
   const dispatch = useDispatch();
@@ -84,8 +85,34 @@ const Products = () => {
 
   const filteredProducts = Array.isArray(products) ? products : [];
 
+  const categoryName = selectedCategory 
+    ? categories.find(cat => cat.id === Number(selectedCategory))?.name 
+    : 'All Products';
+
+  const productListSchema = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "itemListElement": filteredProducts.slice(0, 10).map((product, index) => ({
+      "@type": "ListItem",
+      "position": index + 1,
+      "item": {
+        "@type": "Product",
+        "name": product.name,
+        "image": product.featured_image,
+        "description": product.description || product.name
+      }
+    }))
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
+      <SEO
+        title={`${categoryName} | Shop Quality Kitchen & Home Products - Kitchivo`}
+        description={`Browse ${filteredProducts.length}+ ${categoryName.toLowerCase()} at Kitchivo. Find the best cookware, storage, dinnerware, and kitchen tools with great prices and quality.`}
+        keywords={`${categoryName}, kitchen products, home products, buy ${categoryName.toLowerCase()}, cookware, storage, dinnerware, kitchenware online`}
+        canonicalUrl={`${window.location.origin}/products`}
+        schema={productListSchema}
+      />
       <Navbar />
 
       <Breadcrumb

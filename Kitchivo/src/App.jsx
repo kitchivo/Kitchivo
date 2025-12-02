@@ -20,6 +20,9 @@ import { useDispatch } from 'react-redux';
 import { getProfile } from './redux/slices/AuthSlice';
 import { useEffect } from 'react';
 import { getDashboard, getSystemSettings } from './redux/slices/CommanSlice';
+import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
+
 
 function App() {
   const dispatch = useDispatch();
@@ -34,25 +37,29 @@ function App() {
 
 
   return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/products" element={<Products />} />
-      <Route path="/new-products" element={<NewProducts />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-      <Route path="/verify-otp" element={<VerifyOTP />} />
-      <Route path="/forgot-password" element={<ForgotPassword />} />
-      <Route path="/wishlist" element={<Wishlist />} />
-      <Route path="/about" element={<About />} />
-      <Route path="/contact" element={<Contact />} />
-      <Route path="/category/:category_id" element={<CategoryProducts />} />
-      <Route path="/product/:id" element={<ProductDetail />} />
-      <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-      <Route path="/terms-of-service" element={<TermsOfService />} />
-      <Route path="/profile-edit" element={<ProfileEdit />} />
-      <Route path="/profile" element={<Profile />} />
-      <Route path="/change-password" element={<ChangePassword />} />
-    </Routes>
+    <>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/products" element={<Products />} />
+        <Route path="/new-products" element={<NewProducts />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/verify-otp" element={<VerifyOTP />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/wishlist" element={<Wishlist />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/category/:category_id" element={<CategoryProducts />} />
+        <Route path="/product/:id" element={<ProductDetail />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/terms-of-service" element={<TermsOfService />} />
+        <Route path="/profile-edit" element={<ProfileEdit />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/change-password" element={<ChangePassword />} />
+      </Routes>
+      <Analytics />
+      <SpeedInsights />
+    </>
   );
 }
 

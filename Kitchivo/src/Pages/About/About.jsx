@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import Breadcrumb from '../../components/Breadcrumb';
+import SEO from '../../components/SEO';
 
 const About = () => {
   const stats = [
@@ -72,8 +73,26 @@ const About = () => {
     },
   ];
 
+  const aboutSchema = {
+    "@context": "https://schema.org",
+    "@type": "AboutPage",
+    "mainEntity": {
+      "@type": "Organization",
+      "name": "Kitchivo",
+      "description": "Your trusted destination for quality kitchen and home products. We believe that a well-equipped kitchen is the heart of every home.",
+      "url": window.location.origin
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white font-sans">
+      <SEO
+        title="About Us - Kitchivo | Quality Kitchen & Home Products Since 2019"
+        description="Learn about Kitchivo's journey to bring quality kitchen and home products to your doorstep. Discover our mission, values, and commitment to customer satisfaction with 10K+ happy customers."
+        keywords="about kitchivo, kitchen products company, home products store, quality kitchenware, about us, our story, company values"
+        canonicalUrl={`${window.location.origin}/about`}
+        schema={aboutSchema}
+      />
       <Navbar />
 
       <Breadcrumb 

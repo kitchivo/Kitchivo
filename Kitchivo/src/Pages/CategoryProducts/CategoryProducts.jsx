@@ -9,6 +9,7 @@ import { fetchAllProductsByCategory, createWishlist } from '../../redux/slices/C
 import { toast } from 'react-toastify';
 import Swal from 'sweetalert2';
 import { getProfile } from '../../redux/slices/AuthSlice';
+import SEO from '../../components/SEO';
 
 const CategoryProducts = () => {
   const { category_id } = useParams();
@@ -86,8 +87,23 @@ const CategoryProducts = () => {
   const pagination = categoryProducts?.pagination;
   const displayCategoryName = categoryInfo?.name || 'Category';
 
+  const categorySchema = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": `${displayCategoryName} Products`,
+    "description": categoryInfo?.description || `Browse our collection of ${displayCategoryName.toLowerCase()} products`,
+    "url": `${window.location.origin}/category/${category_id}`
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 font-sans">
+      <SEO
+        title={`${displayCategoryName} Products | Shop Quality ${displayCategoryName} - Kitchivo`}
+        description={categoryInfo?.description || `Explore our wide range of ${displayCategoryName.toLowerCase()} products. Find the best ${displayCategoryName.toLowerCase()} for your kitchen and home at great prices.`}
+        keywords={`${displayCategoryName}, ${displayCategoryName.toLowerCase()} products, buy ${displayCategoryName.toLowerCase()}, ${displayCategoryName.toLowerCase()} online, kitchivo ${displayCategoryName.toLowerCase()}`}
+        canonicalUrl={`${window.location.origin}/category/${category_id}`}
+        schema={categorySchema}
+      />
       <Navbar />
 
       <Breadcrumb

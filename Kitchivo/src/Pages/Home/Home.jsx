@@ -16,6 +16,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
 import { getProfile } from "../../redux/slices/AuthSlice";
+import SEO from "../../components/SEO";
 
 const Home = () => {
   const dispatch = useDispatch();
@@ -66,8 +67,35 @@ const Home = () => {
     }
   };
 
+  const organizationSchema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Kitchivo",
+    "url": window.location.origin,
+    "logo": window.location.origin + "/Logo.png",
+    "description": "Quality kitchen and home products. Discover bestsellers, new arrivals, and curated collections.",
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "telephone": "+390235568493",
+      "contactType": "Customer Service"
+    },
+    "sameAs": [
+      dashboard?.systemSettings?.facebook_link,
+      dashboard?.systemSettings?.instagram_link,
+      dashboard?.systemSettings?.twitter_link,
+      dashboard?.systemSettings?.youtube_link
+    ].filter(Boolean)
+  };
+
   return (
     <div className="min-h-screen bg-white font-sans">
+      <SEO
+        title="Kitchivo — Premium Kitchen & Home Products | Shop Quality Cookware, Storage & More"
+        description="Discover quality kitchen and home products at Kitchivo. Shop bestsellers, new arrivals, cookware, storage solutions, dinnerware, and kitchen tools. Free shipping on select items."
+        keywords="kitchen products, home products, cookware, bakeware, storage solutions, dinnerware, kitchen tools, home decor, Kitchivo, kitchen utensils, cooking equipment"
+        canonicalUrl={window.location.origin}
+        schema={organizationSchema}
+      />
       <Navbar />
       <HeroSection slides={dashboard?.banners} />
       <CategoriesSection categories={dashboard?.categories} />
