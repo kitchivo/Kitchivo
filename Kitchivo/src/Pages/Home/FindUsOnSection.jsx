@@ -8,7 +8,7 @@ const FindUsOnSection = () => {
     {
       name: 'Amazon',
       logo: amazonLogo,
-      link: 'https://www.amazon.in/',
+      link: 'https://www.amazon.in/stores/page/ABCCD0E1-1791-4B48-B9D9-647B766D6A91?ingress=2&lp_context_asin=B0FRZCHK3N&visitId=bde68ce7-6c7c-4586-a39d-f9f17770ccee&store_ref=bl_ast_dp_brandLogo_sto&ref_=cm_sw_r_apann_ast_store_5PN17M0RDSXRCEE0N8BF',
       tagline: 'Prime shipping and exclusive kitchen deals'
     },
     {

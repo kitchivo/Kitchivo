@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 
 const HeroSection = ({ slides = [] }) => {
   const navigate = useNavigate();
   const [currentSlide, setCurrentSlide] = useState(0);
   
-  // Map API slide fields → your UI fields
-  const formattedSlides = slides.map((item) => ({
+  // Map API slide fields → your UI fields (memoized)
+  const formattedSlides = useMemo(() => slides.map((item) => ({
     image: item.image,
     title: item.title,
     subtitle: item.title_1,
     description: item.title_2,
-  }));
+  })), [slides]);
 
   useEffect(() => {
     if (formattedSlides.length === 0) return;
@@ -23,12 +23,16 @@ const HeroSection = ({ slides = [] }) => {
     return () => clearInterval(timer);
   }, [formattedSlides.length]);
 
-  const scrollToSection = (id) => {
+  const scrollToSection = useCallback((id) => {
     const element = document.getElementById(id);
     if (element) {
       element.scrollIntoView({ behavior: "smooth" });
     }
-  };
+  }, []);
+
+  const handleShopNow = useCallback(() => {
+    navigate("/products");
+  }, [navigate]);
 
   if (formattedSlides.length === 0) return null;
 
@@ -51,7 +55,12 @@ const HeroSection = ({ slides = [] }) => {
             <img
               src={slide.image}
               alt={slide.title}
+              loading={index === 0 ? "eager" : "lazy"}
+              decoding="async"
               className="w-full h-full object-cover"
+              onError={(e) => {
+                e.target.src = 'https://via.placeholder.com/1920x1080?text=No+Image';
+              }}
             />
             <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/40"></div>
           </div>
@@ -106,7 +115,7 @@ const HeroSection = ({ slides = [] }) => {
               {/* Buttons */}
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 relative z-10 pt-2">
                 <button
-                  onClick={() => navigate("/products")}
+                  onClick={handleShopNow}
                   className="px-6 sm:px-8 py-3 sm:py-4 bg-lima-600 text-white font-semibold text-sm sm:text-base rounded-lg hover:bg-lima-700 active:bg-lima-800 transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-lg flex items-center justify-center gap-2"
                 >
                   <span>Shop Now</span>

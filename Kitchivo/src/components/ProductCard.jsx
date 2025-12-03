@@ -1,13 +1,19 @@
-import React from "react";
+import React, { memo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import ProductPrice from "./ProductPrice";
 
-const ProductCard = ({ product, hideWishlistButton = false, onAddToWishlist }) => {
+const ProductCard = memo(({ product, hideWishlistButton = false, onAddToWishlist }) => {
   const navigate = useNavigate();
 
-  const handleQuickView = () => {
+  const handleQuickView = useCallback(() => {
     navigate(`/product/${product.id}`);
-  };
+  }, [navigate, product.id]);
+
+  const handleWishlistClick = useCallback(() => {
+    if (onAddToWishlist) {
+      onAddToWishlist(product);
+    }
+  }, [onAddToWishlist, product]);
 
   const isWishlisted = !!product?.is_wishlisted;
 
@@ -19,7 +25,12 @@ const ProductCard = ({ product, hideWishlistButton = false, onAddToWishlist }) =
           <img
             src={product.featured_image}
             alt={product.name}
+            loading="lazy"
+            decoding="async"
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            onError={(e) => {
+              e.target.src = 'https://via.placeholder.com/400x400?text=No+Image';
+            }}
           />
 
           {/* Discount Badge */}
@@ -39,7 +50,7 @@ const ProductCard = ({ product, hideWishlistButton = false, onAddToWishlist }) =
                     : 'bg-white hover:bg-lima-600 active:bg-lima-700 hover:text-white active:text-white'
                 }`}
                 aria-label="Add to Wishlist"
-                onClick={onAddToWishlist ? () => onAddToWishlist(product) : undefined}
+                onClick={handleWishlistClick}
               >
                 <svg
                   className="w-4 h-4 sm:w-5 sm:h-5"
@@ -99,7 +110,9 @@ const ProductCard = ({ product, hideWishlistButton = false, onAddToWishlist }) =
       </div>
     </>
   );
-};
+});
+
+ProductCard.displayName = 'ProductCard';
 
 export default ProductCard;
 

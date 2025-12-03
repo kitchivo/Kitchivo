@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useCallback, useMemo } from "react";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import HeroSection from "./HeroSection";
@@ -27,7 +27,7 @@ const Home = () => {
     dispatch(getDashboard());
   }, [dispatch])
 
-  const handleAddToWishlist = async (product) => {
+  const handleAddToWishlist = useCallback(async (product) => {
     const token = localStorage.getItem('token');
 
     if (!token) {
@@ -65,9 +65,9 @@ const Home = () => {
     } catch (error) {
       toast.error('Failed to add to wishlist');
     }
-  };
+  }, [dispatch, navigate]);
 
-  const organizationSchema = {
+  const organizationSchema = useMemo(() => ({
     "@context": "https://schema.org",
     "@type": "Organization",
     "name": "Kitchivo",
@@ -85,7 +85,7 @@ const Home = () => {
       dashboard?.systemSettings?.twitter_link,
       dashboard?.systemSettings?.youtube_link
     ].filter(Boolean)
-  };
+  }), [dashboard?.systemSettings]);
 
   return (
     <div className="min-h-screen bg-white font-sans">

@@ -713,7 +713,12 @@ const ProductDetail = () => {
                     <img
                       src={img.url}
                       alt={`${product.name} view ${index + 1}`}
+                      loading={index < 3 ? "eager" : "lazy"}
+                      decoding="async"
                       className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.target.src = 'https://via.placeholder.com/100x100?text=No+Image';
+                      }}
                     />
                   </button>
                 ))}
@@ -726,7 +731,12 @@ const ProductDetail = () => {
                     <img
                       src={selectedImageUrl}
                       alt={product.name}
+                      loading="eager"
+                      decoding="async"
                       className="w-full h-full object-contain"
+                      onError={(e) => {
+                        e.target.src = 'https://via.placeholder.com/600x600?text=No+Image';
+                      }}
                     />
                   ) : (
                     <div className="text-gray-400 text-sm">

@@ -109,7 +109,12 @@ const About = () => {
           <img 
             src="https://images.unsplash.com/photo-1556911220-bff31c812dba?w=1920&h=1080&fit=crop" 
             alt="Kitchivo Kitchen" 
+            loading="eager"
+            decoding="async"
             className="w-full h-full object-cover"
+            onError={(e) => {
+              e.target.src = 'https://via.placeholder.com/1920x1080?text=Kitchivo+Kitchen';
+            }}
           />
           {/* Overlay */}
           <div className="absolute inset-0 bg-linear-to-r from-black/70 via-black/50 to-black/30"></div>
@@ -182,7 +187,12 @@ const About = () => {
               <img 
                 src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&h=600&fit=crop" 
                 alt="Our Story" 
+                loading="lazy"
+                decoding="async"
                 className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.target.src = 'https://via.placeholder.com/800x600?text=Our+Story';
+                }}
               />
             </div>
           </div>
@@ -203,16 +213,27 @@ const About = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
             {values.map((value, index) => (
-              <div key={index} className="bg-white rounded-xl p-6 shadow-sm hover:shadow-lg transition-all duration-300">
-                <div className="w-14 h-14 bg-lima-100 rounded-lg flex items-center justify-center text-lima-600 mb-4">
-                  {value.icon}
+              <div 
+                key={index} 
+                className="group bg-white rounded-xl p-6 shadow-sm hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 hover:scale-105 cursor-pointer border border-transparent hover:border-lima-200 relative overflow-hidden"
+              >
+                {/* Animated background gradient on hover */}
+                <div className="absolute inset-0 bg-gradient-to-br from-lima-50/0 to-lima-100/0 group-hover:from-lima-50/50 group-hover:to-lima-100/30 transition-all duration-500 rounded-xl"></div>
+                
+                {/* Content wrapper */}
+                <div className="relative z-10">
+                  <div className="w-14 h-14 bg-lima-100 rounded-lg flex items-center justify-center text-lima-600 mb-4 group-hover:bg-lima-600 group-hover:text-white transition-all duration-500 group-hover:scale-110 group-hover:rotate-6">
+                    <div className="group-hover:scale-110 transition-transform duration-500">
+                      {value.icon}
+                    </div>
+                  </div>
+                  <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 group-hover:text-lima-700 transition-colors duration-300">
+                    {value.title}
+                  </h3>
+                  <p className="text-sm text-gray-600 leading-relaxed group-hover:text-gray-700 transition-colors duration-300">
+                    {value.description}
+                  </p>
                 </div>
-                <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">
-                  {value.title}
-                </h3>
-                <p className="text-sm text-gray-600 leading-relaxed">
-                  {value.description}
-                </p>
               </div>
             ))}
           </div>
@@ -238,7 +259,12 @@ const About = () => {
                   <img 
                     src={member.image} 
                     alt={member.name} 
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
+                    onError={(e) => {
+                      e.target.src = 'https://via.placeholder.com/400x400?text=Team+Member';
+                    }}
                   />
                 </div>
                 <div className="p-6">
@@ -271,64 +297,94 @@ const About = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div className="bg-white rounded-xl p-6 shadow-sm">
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+            <div className="group bg-white rounded-xl p-6 shadow-sm hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 hover:scale-105 cursor-pointer border border-transparent hover:border-green-200 relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-green-50/0 to-green-100/0 group-hover:from-green-50/50 group-hover:to-green-100/30 transition-all duration-500 rounded-xl"></div>
+              <div className="relative z-10">
+                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4 group-hover:bg-green-600 group-hover:text-white transition-all duration-500 group-hover:scale-110 group-hover:rotate-6">
+                  <div className="group-hover:scale-110 transition-transform duration-500">
+                    <svg className="w-6 h-6 text-green-600 group-hover:text-white transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                </div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-green-700 transition-colors duration-300">Certified Quality</h3>
+                <p className="text-sm text-gray-600 group-hover:text-gray-700 transition-colors duration-300">All our products are certified and tested for safety and durability.</p>
               </div>
-              <h3 className="text-lg font-bold text-gray-900 mb-2">Certified Quality</h3>
-              <p className="text-sm text-gray-600">All our products are certified and tested for safety and durability.</p>
             </div>
 
-            <div className="bg-white rounded-xl p-6 shadow-sm">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+            <div className="group bg-white rounded-xl p-6 shadow-sm hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 hover:scale-105 cursor-pointer border border-transparent hover:border-blue-200 relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-50/0 to-blue-100/0 group-hover:from-blue-50/50 group-hover:to-blue-100/30 transition-all duration-500 rounded-xl"></div>
+              <div className="relative z-10">
+                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4 group-hover:bg-blue-600 group-hover:text-white transition-all duration-500 group-hover:scale-110 group-hover:rotate-6">
+                  <div className="group-hover:scale-110 transition-transform duration-500">
+                    <svg className="w-6 h-6 text-blue-600 group-hover:text-white transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                </div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-blue-700 transition-colors duration-300">Best Price Guarantee</h3>
+                <p className="text-sm text-gray-600 group-hover:text-gray-700 transition-colors duration-300">Get the best prices without compromising on quality.</p>
               </div>
-              <h3 className="text-lg font-bold text-gray-900 mb-2">Best Price Guarantee</h3>
-              <p className="text-sm text-gray-600">Get the best prices without compromising on quality.</p>
             </div>
 
-            <div className="bg-white rounded-xl p-6 shadow-sm">
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
-                </svg>
+            <div className="group bg-white rounded-xl p-6 shadow-sm hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 hover:scale-105 cursor-pointer border border-transparent hover:border-purple-200 relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-purple-50/0 to-purple-100/0 group-hover:from-purple-50/50 group-hover:to-purple-100/30 transition-all duration-500 rounded-xl"></div>
+              <div className="relative z-10">
+                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4 group-hover:bg-purple-600 group-hover:text-white transition-all duration-500 group-hover:scale-110 group-hover:rotate-6">
+                  <div className="group-hover:scale-110 transition-transform duration-500">
+                    <svg className="w-6 h-6 text-purple-600 group-hover:text-white transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                    </svg>
+                  </div>
+                </div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-purple-700 transition-colors duration-300">Easy Returns</h3>
+                <p className="text-sm text-gray-600 group-hover:text-gray-700 transition-colors duration-300">Not satisfied? Return within 7 days, no questions asked.</p>
               </div>
-              <h3 className="text-lg font-bold text-gray-900 mb-2">Easy Returns</h3>
-              <p className="text-sm text-gray-600">Not satisfied? Return within 7 days, no questions asked.</p>
             </div>
 
-            <div className="bg-white rounded-xl p-6 shadow-sm">
-              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
+            <div className="group bg-white rounded-xl p-6 shadow-sm hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 hover:scale-105 cursor-pointer border border-transparent hover:border-orange-200 relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-orange-50/0 to-orange-100/0 group-hover:from-orange-50/50 group-hover:to-orange-100/30 transition-all duration-500 rounded-xl"></div>
+              <div className="relative z-10">
+                <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4 group-hover:bg-orange-600 group-hover:text-white transition-all duration-500 group-hover:scale-110 group-hover:rotate-6">
+                  <div className="group-hover:scale-110 transition-transform duration-500">
+                    <svg className="w-6 h-6 text-orange-600 group-hover:text-white transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                  </div>
+                </div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-orange-700 transition-colors duration-300">Fast Shipping</h3>
+                <p className="text-sm text-gray-600 group-hover:text-gray-700 transition-colors duration-300">Quick delivery across India with real-time tracking.</p>
               </div>
-              <h3 className="text-lg font-bold text-gray-900 mb-2">Fast Shipping</h3>
-              <p className="text-sm text-gray-600">Quick delivery across India with real-time tracking.</p>
             </div>
 
-            <div className="bg-white rounded-xl p-6 shadow-sm">
-              <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                </svg>
+            <div className="group bg-white rounded-xl p-6 shadow-sm hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 hover:scale-105 cursor-pointer border border-transparent hover:border-red-200 relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-red-50/0 to-red-100/0 group-hover:from-red-50/50 group-hover:to-red-100/30 transition-all duration-500 rounded-xl"></div>
+              <div className="relative z-10">
+                <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mb-4 group-hover:bg-red-600 group-hover:text-white transition-all duration-500 group-hover:scale-110 group-hover:rotate-6">
+                  <div className="group-hover:scale-110 transition-transform duration-500">
+                    <svg className="w-6 h-6 text-red-600 group-hover:text-white transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                  </div>
+                </div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-red-700 transition-colors duration-300">Customer Support</h3>
+                <p className="text-sm text-gray-600 group-hover:text-gray-700 transition-colors duration-300">24/7 support team ready to help you with any queries.</p>
               </div>
-              <h3 className="text-lg font-bold text-gray-900 mb-2">Customer Support</h3>
-              <p className="text-sm text-gray-600">24/7 support team ready to help you with any queries.</p>
             </div>
 
-            <div className="bg-white rounded-xl p-6 shadow-sm">
-              <div className="w-12 h-12 bg-pink-100 rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
-                </svg>
+            <div className="group bg-white rounded-xl p-6 shadow-sm hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 hover:scale-105 cursor-pointer border border-transparent hover:border-pink-200 relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-pink-50/0 to-pink-100/0 group-hover:from-pink-50/50 group-hover:to-pink-100/30 transition-all duration-500 rounded-xl"></div>
+              <div className="relative z-10">
+                <div className="w-12 h-12 bg-pink-100 rounded-lg flex items-center justify-center mb-4 group-hover:bg-pink-600 group-hover:text-white transition-all duration-500 group-hover:scale-110 group-hover:rotate-6">
+                  <div className="group-hover:scale-110 transition-transform duration-500">
+                    <svg className="w-6 h-6 text-pink-600 group-hover:text-white transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+                    </svg>
+                  </div>
+                </div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-pink-700 transition-colors duration-300">Gift Wrapping</h3>
+                <p className="text-sm text-gray-600 group-hover:text-gray-700 transition-colors duration-300">Special gift wrapping service available for all occasions.</p>
               </div>
-              <h3 className="text-lg font-bold text-gray-900 mb-2">Gift Wrapping</h3>
-              <p className="text-sm text-gray-600">Special gift wrapping service available for all occasions.</p>
             </div>
           </div>
         </div>
