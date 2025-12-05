@@ -792,7 +792,7 @@ const ProductDetail = () => {
                 {/* Thumbnail Container */}
                 <div
                   ref={thumbnailContainerRef}
-                  className="flex flex-row lg:flex-col gap-2 lg:gap-3 overflow-x-auto lg:overflow-x-hidden lg:overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100"
+                  className="flex flex-row lg:flex-col gap-2 lg:gap-3 overflow-x-auto lg:overflow-x-hidden lg:overflow-y-auto scrollbar-hide"
                   style={{ maxHeight: "calc(60vh - 200px)" }}
                 >
                   {displayedImages.map((img, index) => (
